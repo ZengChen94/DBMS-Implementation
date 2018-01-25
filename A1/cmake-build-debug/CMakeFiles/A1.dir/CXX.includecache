@@ -1,0 +1,88 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/./MyDB_PageHandle.h
+memory
+-
+../headers/MyDB_Page.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/headers/MyDB_Page.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_BufferManager.h
+map
+-
+list
+-
+vector
+-
+./MyDB_PageHandle.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/./MyDB_PageHandle.h
+../../Catalog/headers/MyDB_Table.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/headers/MyDB_Table.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_Page.h
+../../Catalog/headers/MyDB_Table.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/headers/MyDB_Table.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_PageHandle.h
+memory
+-
+../headers/MyDB_Page.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_Page.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/source/MyDB_BufferManager.cc
+string
+-
+../../BufferMgr/headers/MyDB_BufferManager.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_BufferManager.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/source/MyDB_Page.cc
+../headers/MyDB_BufferManager.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_BufferManager.h
+../headers/MyDB_Page.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_Page.h
+../../Catalog/headers/MyDB_Table.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/headers/MyDB_Table.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/source/MyDB_PageHandle.cc
+memory
+-
+../headers/MyDB_PageHandle.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_PageHandle.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferTest/source/BufferQUnit.cc
+iostream
+-
+unistd.h
+-
+vector
+-
+../../BufferMgr/headers/MyDB_BufferManager.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_BufferManager.h
+../../BufferMgr/headers/MyDB_PageHandle.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/BufferMgr/headers/MyDB_PageHandle.h
+../../Catalog/headers/MyDB_Table.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/headers/MyDB_Table.h
+../../Qunit/headers/QUnit.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Qunit/headers/QUnit.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/headers/MyDB_Table.h
+memory
+-
+string
+-
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/source/MyDB_Table.cc
+../headers/MyDB_Table.h
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Catalog/headers/MyDB_Table.h
+
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/Main/Qunit/headers/QUnit.h
+sstream
+-
+string
+-
+

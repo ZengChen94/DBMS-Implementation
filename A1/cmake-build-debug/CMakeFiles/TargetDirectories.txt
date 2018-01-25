@@ -1,0 +1,3 @@
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/cmake-build-debug/CMakeFiles/A1.dir
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/study/Rice/CourseWork/COMP 530/hw/hw1/A1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
