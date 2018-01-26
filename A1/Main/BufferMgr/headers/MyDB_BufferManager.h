@@ -55,7 +55,7 @@ public:
 
 	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS
     void remove(MyDB_Page &page);
-    void evict();
+    void evictLRU();
     void process(MyDB_Page &page);
 
 private:
@@ -66,11 +66,11 @@ private:
 	size_t numPages;
 	string tempFile;
 
-    long tempIndex;//keep track of the id of anonymous pages
+    long tempIndex;// keep track of the id of anonymous pages
 
     long globalTimeStamp;
 
-    map<pair<MyDB_TablePtr, long>, MyDB_PagePtr> page_map;
+    map<pair<MyDB_TablePtr, long>, MyDB_PagePtr> page_map;// pair, page
 };
 
 #endif

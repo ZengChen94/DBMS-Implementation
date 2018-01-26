@@ -11,6 +11,7 @@ void *MyDB_PageHandleBase :: getBytes () {
 }
 
 void MyDB_PageHandleBase :: wroteBytes () {
+//    cout << "wroteBytes is called" << endl;
     this->page->wroteBytes();
 }
 

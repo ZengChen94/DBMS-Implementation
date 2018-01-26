@@ -40,7 +40,6 @@ void writeSymbols (char *bytes, size_t len, int i) {
 }
 
 int main () {
-
 	QUnit::UnitTest qunit(cerr, QUnit::verbose);
 
 	// UNIT TEST 1: A BIG ONE!!
@@ -50,15 +49,15 @@ int main () {
 		MyDB_BufferManager myMgr (64, 16, "tempDSFSD");//here is buffer, which contains pages
 		MyDB_TablePtr table1 = make_shared <MyDB_Table> ("tempTable", "foobar");//table of database
 
-		// allocate a pinned page
+
+		// allocate a pinned page (1)
 		cout << "allocating pinned page\n";
 		MyDB_PageHandle pinnedPage = myMgr.getPinnedPage (table1, 0);
 		char *bytes = (char *) pinnedPage->getBytes ();
 		writeNums (bytes, 64, 0);
 		pinnedPage->wroteBytes ();//dirty
-
 		
-		// create a bunch of pinned pages and remember them
+		// create a bunch of pinned pages and remember them (9)
 		vector <MyDB_PageHandle> myHandles;
 		for (int i = 1; i < 10; i++) {
 			cout << "allocating pinned page\n";
@@ -73,7 +72,7 @@ int main () {
 		vector <MyDB_PageHandle> temp;
 		myHandles = temp;//the deconstructor will be called
 
-		// now remember 8 more pages
+		// now remember 8 more pages (8)
 		for (int i = 0; i < 8; i++) {
 			cout << "allocating pinned page\n";
 			MyDB_PageHandle temp = myMgr.getPinnedPage (table1, i);
@@ -83,7 +82,7 @@ int main () {
 			if (i == 0)
 				writeNums (bytes, 64, i);
 			else
-				writeSymbols (bytes, 64, i);
+                writeLetters (bytes, 64, i);
 			temp->wroteBytes ();
 			myHandles.push_back (temp);
 		}

@@ -15,18 +15,21 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 
+#include <climits>
+
 using namespace std;
 
 MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i) {
     pair<MyDB_TablePtr, long> whichPage = make_pair(whichTable, i);
     if (this->page_map.count(whichPage) == 0) {
         if (this->buffer.size() == 0) {
-            this->evict();
+            this->evictLRU();
         }
-        if (this->buffer.size() == 0) {// cannot evict successfully
+        if (this->buffer.size() == 0) {// cannot evictLRU successfully
             return nullptr;
         }
         else {
+            // MyDB_TablePtr whichTable, long page_id, bool pinned, MyDB_BufferManager& bufferManager, long timeStamp, bool buffered
             MyDB_PagePtr page = make_shared <MyDB_Page> (whichTable, i, false, *this, this->globalTimeStamp, false);
             this->globalTimeStamp += 1;
             this->page_map[whichPage] = page;
@@ -44,7 +47,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
 
 MyDB_PageHandle MyDB_BufferManager :: getPage () {
     if (this->buffer.size() == 0) {
-        this->evict();
+        this->evictLRU();
     }
     if (this->buffer.size() == 0) {
         return nullptr;
@@ -59,10 +62,11 @@ MyDB_PageHandle MyDB_BufferManager :: getPage () {
 }
 
 MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, long i) {
+//    cout << "getPinnedPage is called" << endl;
     pair<MyDB_TablePtr, long> whichPage = make_pair(whichTable, i);
     if (this->page_map.count(whichPage) == 0) {
         if (this->buffer.size() == 0) {
-            this->evict();
+            this->evictLRU();
         }
         if (this->buffer.size() == 0) {
             return nullptr;
@@ -85,7 +89,7 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
 
 MyDB_PageHandle MyDB_BufferManager :: getPinnedPage () {
     if (this->buffer.size() == 0) {
-        this->evict();
+        this->evictLRU();
     }
     if (this->buffer.size() == 0) {
         return nullptr;
@@ -104,6 +108,7 @@ void MyDB_BufferManager :: unpin (MyDB_PageHandle unpinMe) {
 }
 
 MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, string tempFile): pageSize(pageSize), numPages(numPages), tempFile(tempFile){
+//    cout << "Table is created" << endl;
     this->tempIndex = 0;
     this->globalTimeStamp = 0;
 	for (size_t i = 0; i < numPages; i++) {
@@ -118,30 +123,36 @@ MyDB_BufferManager :: ~MyDB_BufferManager () {
 }
 
 void MyDB_BufferManager :: remove(MyDB_Page &page){
+//    cout << page.bytes << endl;
+    int flag = 0;
+    int fd = 0;
     if (page.dirty) {
         // TODO
         // load from page.bytes to (page.whichTable, page.page_id)
-        int fd;
+//        int fd;
         if (page.whichTable == nullptr){
-            fd = open(tempFile.c_str (), O_CREAT | O_RDWR | O_SYNC, 0666);
+            fd = open(tempFile.c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+//            fd = open(tempFile.c_str(), O_CREAT | O_RDWR, 0666);
         }
         else{
-            fd = open(page.whichTable->getStorageLoc().c_str (), O_CREAT | O_RDWR | O_SYNC, 0666);
+            fd = open(page.whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+//            fd = open(page.whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR, 0666);
         }
         lseek(fd, page.getPageID() * this->pageSize, SEEK_SET);
-        write(fd, page.bytes, this->pageSize);
+        flag = write(fd, page.bytes, this->pageSize);
+//        _commit(fd);// for windows
         close(fd);
         page.setDirty(false);
     }
     page.setBuffered(false);
-    page.bytes = nullptr;
+//    page.bytes = nullptr;
     buffer.push_back(page.bytes);
 }
 
 void MyDB_BufferManager :: process(MyDB_Page &page){
-    if (page.getBuffered() == false) {
+    if (page.getBuffered() == false) { // if not buffered, then copy from table to bufferManager
         if (this->buffer.size() == 0) {
-            this->evict();
+            this->evictLRU();
         }
         if (this->buffer.size() == 0) {
             return;
@@ -153,53 +164,63 @@ void MyDB_BufferManager :: process(MyDB_Page &page){
         // load from (page.whichTable, page.page_id) to page.bytes
         int fd;
         if (page.whichTable == nullptr){
-            fd = open(this->tempFile.c_str (), O_CREAT | O_RDWR | O_SYNC, 0666);
+            fd = open(this->tempFile.c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+//            fd = open(this->tempFile.c_str(), O_CREAT | O_RDWR, 0666);
         }
         else{
-            fd = open(page.whichTable->getStorageLoc().c_str (), O_CREAT | O_RDWR | O_SYNC, 0666);
+            fd = open(page.whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+//            fd = open(page.whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR, 0666);
         }
         lseek(fd, page.getPageID() * this->pageSize, SEEK_SET);
         read(fd, page.bytes, this->pageSize);
+//        _commit(fd);// for windows
         close(fd);
     }
 }
 
 // LRU Algorithm
-void MyDB_BufferManager :: evict(){
-    long minTimeStamp = LONG_MAX;
+void MyDB_BufferManager :: evictLRU(){
+    long minTimeStamp = LONG_MAX; // max_long, begin() can be pinned
+
     // search for minTimeStamp
     for (auto key = this->page_map.begin(); key != this->page_map.end(); ++key) {
         MyDB_PagePtr page = key->second;
-        if (page->getTimeStamp() < minTimeStamp && page->getPinned() == false) {
+        if (page->getTimeStamp() < minTimeStamp && page->getPinned() == false && page->getBuffered() == true) {
             minTimeStamp = page->getTimeStamp();
         }
     }
+
     // remove
-    for (auto key = this->page_map.begin(); key != this->page_map.end(); ++key) {
-        MyDB_PagePtr page = key->second;
-        if (page->getTimeStamp() == minTimeStamp) {
-            if (page->dirty) {
-                // TODO
-                // load from page->bytes to (page->whichTable, page->page_id)
-                int fd;
-                if (page->whichTable == nullptr){
-                    fd = open(tempFile.c_str (), O_CREAT | O_RDWR | O_SYNC, 0666);
+    if (minTimeStamp != LONG_MAX) {
+        for (auto key = this->page_map.begin(); key != this->page_map.end(); ++key) {
+            MyDB_PagePtr page = key->second;
+            if (page->getTimeStamp() == minTimeStamp) {
+                if (page->dirty) {
+                    // TODO
+                    // load from page->bytes to (page->whichTable, page->page_id)
+                    int fd;
+                    if (page->whichTable == nullptr){
+                        fd = open(tempFile.c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+//                        fd = open(tempFile.c_str(), O_CREAT | O_RDWR, 0666);
+                    }
+                    else{
+//                    fd = open(page->whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+                        fd = open(page->whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR, 0666);
+                    }
+                    lseek(fd, page->getPageID() * this->pageSize, SEEK_SET);
+                    write(fd, page->bytes, this->pageSize);
+//                    _commit(fd);// for windows
+                    close(fd);
+                    page->setDirty(false);
                 }
-                else{
-                    fd = open(page->whichTable->getStorageLoc().c_str (), O_CREAT | O_RDWR | O_SYNC, 0666);
-                }
-                lseek(fd, page->getPageID() * this->pageSize, SEEK_SET);
-                write(fd, page->bytes, this->pageSize);
-                close(fd);
-                page->setDirty(false);
+                page->setBuffered(false);
+//                page->bytes = nullptr;
+                buffer.push_back(page->bytes);
+                buffer.push_back(malloc(pageSize));
             }
-            page->setBuffered(false);
-            page->bytes = nullptr;
-            buffer.push_back(page->bytes);
         }
     }
 }
 	
 #endif
-
 

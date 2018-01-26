@@ -2,6 +2,7 @@
 #define PAGE_H
 
 //#include "MyDB_Table.h"
+#include <iostream>
 #include "../../Catalog/headers/MyDB_Table.h"
 
 using namespace std;
@@ -22,6 +23,7 @@ public:
 	void* getBytes();
 
 	void wroteBytes() {
+//        cout << this->bytes << endl;
         this->dirty = true;
     }
 
