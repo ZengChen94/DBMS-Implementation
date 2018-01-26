@@ -20,7 +20,7 @@ public:
 
 	~MyDB_Page();
 
-	void* getBytes();
+    char* getBytes();
 
 	void wroteBytes() {
 //        cout << this->bytes << endl;
@@ -80,7 +80,7 @@ private:
     long page_id;
 	bool pinned;
 	bool dirty;
-	void* bytes;
+	char* bytes;
 	int refCount;
     long timeStamp;
     bool buffered;

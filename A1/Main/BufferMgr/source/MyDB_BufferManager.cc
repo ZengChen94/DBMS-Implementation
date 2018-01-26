@@ -23,10 +23,8 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
     pair<MyDB_TablePtr, long> whichPage = make_pair(whichTable, i);
     if (this->page_map.count(whichPage) == 0) {
         if (this->buffer.size() == 0) {
-            this->evictLRU();
-        }
-        if (this->buffer.size() == 0) {// cannot evictLRU successfully
-            return nullptr;
+            if (this->evictLRU() == false)
+                return nullptr;
         }
         else {
             // MyDB_TablePtr whichTable, long page_id, bool pinned, MyDB_BufferManager& bufferManager, long timeStamp, bool buffered
@@ -47,10 +45,8 @@ MyDB_PageHandle MyDB_BufferManager :: getPage (MyDB_TablePtr whichTable, long i)
 
 MyDB_PageHandle MyDB_BufferManager :: getPage () {
     if (this->buffer.size() == 0) {
-        this->evictLRU();
-    }
-    if (this->buffer.size() == 0) {
-        return nullptr;
+        if (this->evictLRU() == false)
+            return nullptr;
     }
     pair<MyDB_TablePtr, long> whichPage = make_pair(nullptr, this->tempIndex);
     MyDB_PagePtr page = make_shared <MyDB_Page> (nullptr, this->tempIndex, false, *this, this->globalTimeStamp, false);
@@ -66,10 +62,8 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
     pair<MyDB_TablePtr, long> whichPage = make_pair(whichTable, i);
     if (this->page_map.count(whichPage) == 0) {
         if (this->buffer.size() == 0) {
-            this->evictLRU();
-        }
-        if (this->buffer.size() == 0) {
-            return nullptr;
+            if (this->evictLRU() == false)
+                return nullptr;
         }
         else {
             MyDB_PagePtr page = make_shared <MyDB_Page> (whichTable, i, true, *this, this->globalTimeStamp, false);
@@ -89,10 +83,8 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage (MyDB_TablePtr whichTable, l
 
 MyDB_PageHandle MyDB_BufferManager :: getPinnedPage () {
     if (this->buffer.size() == 0) {
-        this->evictLRU();
-    }
-    if (this->buffer.size() == 0) {
-        return nullptr;
+        if (this->evictLRU() == false)
+            return nullptr;
     }
     pair<MyDB_TablePtr, long> whichPage = make_pair(nullptr, this->tempIndex);
     MyDB_PagePtr page = make_shared <MyDB_Page> (nullptr, this->tempIndex, true, *this, this->globalTimeStamp, false);
@@ -112,7 +104,7 @@ MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, stri
     this->tempIndex = 0;
     this->globalTimeStamp = 0;
 	for (size_t i = 0; i < numPages; i++) {
-		buffer.push_back(malloc(pageSize));
+		buffer.push_back((char*)malloc(pageSize));
 	}
 }
 
@@ -152,10 +144,8 @@ void MyDB_BufferManager :: remove(MyDB_Page &page){
 void MyDB_BufferManager :: process(MyDB_Page &page){
     if (page.getBuffered() == false) { // if not buffered, then copy from table to bufferManager
         if (this->buffer.size() == 0) {
-            this->evictLRU();
-        }
-        if (this->buffer.size() == 0) {
-            return;
+            if (this->evictLRU() == false)
+                return;
         }
         page.setBuffered(true);
         page.bytes = this->buffer[this->buffer.size()-1];
@@ -179,7 +169,7 @@ void MyDB_BufferManager :: process(MyDB_Page &page){
 }
 
 // LRU Algorithm
-void MyDB_BufferManager :: evictLRU(){
+bool MyDB_BufferManager :: evictLRU(){
     long minTimeStamp = LONG_MAX; // max_long, begin() can be pinned
 
     // search for minTimeStamp
@@ -190,8 +180,12 @@ void MyDB_BufferManager :: evictLRU(){
         }
     }
 
+    // cannot find the page to be evicted
+    if (minTimeStamp == LONG_MAX) {
+        return false;
+    }
     // remove
-    if (minTimeStamp != LONG_MAX) {
+    else {
         for (auto key = this->page_map.begin(); key != this->page_map.end(); ++key) {
             MyDB_PagePtr page = key->second;
             if (page->getTimeStamp() == minTimeStamp) {
@@ -204,8 +198,8 @@ void MyDB_BufferManager :: evictLRU(){
 //                        fd = open(tempFile.c_str(), O_CREAT | O_RDWR, 0666);
                     }
                     else{
-//                    fd = open(page->whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
-                        fd = open(page->whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR, 0666);
+                        fd = open(page->whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR | O_SYNC, 0666);
+//                        fd = open(page->whichTable->getStorageLoc().c_str(), O_CREAT | O_RDWR, 0666);
                     }
                     lseek(fd, page->getPageID() * this->pageSize, SEEK_SET);
                     write(fd, page->bytes, this->pageSize);
@@ -216,9 +210,10 @@ void MyDB_BufferManager :: evictLRU(){
                 page->setBuffered(false);
 //                page->bytes = nullptr;
                 buffer.push_back(page->bytes);
-                buffer.push_back(malloc(pageSize));
+//                buffer.push_back((char*)malloc(pageSize));
             }
         }
+        return true;
     }
 }
 	

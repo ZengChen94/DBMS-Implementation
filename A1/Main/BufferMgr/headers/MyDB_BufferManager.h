@@ -55,13 +55,13 @@ public:
 
 	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS
     void remove(MyDB_Page &page);
-    void evictLRU();
+    bool evictLRU();
     void process(MyDB_Page &page);
 
 private:
 
 	// YOUR STUFF HERE
-	vector<void*> buffer;
+	vector<char*> buffer;
 	size_t pageSize;
 	size_t numPages;
 	string tempFile;
