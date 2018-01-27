@@ -55,18 +55,20 @@ public:
 
 	// FEEL FREE TO ADD ADDITIONAL PUBLIC METHODS
     void remove(MyDB_Page &page);
-    bool evictLRU();
+
     void process(MyDB_Page &page);
+
+    bool evictLRU();
 
 private:
 
 	// YOUR STUFF HERE
-	vector<char*> buffer;
+	vector<void*> buffer;
 	size_t pageSize;
 	size_t numPages;
 	string tempFile;
 
-    long tempIndex;// keep track of the id of anonymous pages
+    long anonIndex;// keep track of the id of anonymous pages
 
     long globalTimeStamp;
 

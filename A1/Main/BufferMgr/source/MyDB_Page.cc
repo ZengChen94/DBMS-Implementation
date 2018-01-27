@@ -19,7 +19,7 @@ MyDB_Page :: ~MyDB_Page() {
 
 }
 
-char* MyDB_Page :: getBytes() {
+void* MyDB_Page :: getBytes() {
     bufferManager.process(*this);
 	return bytes;
 }

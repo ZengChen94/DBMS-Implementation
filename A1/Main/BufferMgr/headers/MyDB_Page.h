@@ -20,7 +20,7 @@ public:
 
 	~MyDB_Page();
 
-    char* getBytes();
+    void* getBytes();
 
 	void wroteBytes() {
 //        cout << this->bytes << endl;
@@ -74,13 +74,14 @@ public:
     }
 
 private:
-	friend class MyDB_BufferManager;
+	friend class MyDB_BufferManager; // solve the problem of inaccessible
+
     MyDB_BufferManager& bufferManager;
 	MyDB_TablePtr whichTable;
     long page_id;
 	bool pinned;
 	bool dirty;
-	char* bytes;
+    void* bytes;
 	int refCount;
     long timeStamp;
     bool buffered;

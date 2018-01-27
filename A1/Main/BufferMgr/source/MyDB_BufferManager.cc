@@ -48,9 +48,9 @@ MyDB_PageHandle MyDB_BufferManager :: getPage () {
         if (this->evictLRU() == false)
             return nullptr;
     }
-    pair<MyDB_TablePtr, long> whichPage = make_pair(nullptr, this->tempIndex);
-    MyDB_PagePtr page = make_shared <MyDB_Page> (nullptr, this->tempIndex, false, *this, this->globalTimeStamp, false);
-    this->tempIndex += 1;
+    pair<MyDB_TablePtr, long> whichPage = make_pair(nullptr, this->anonIndex);
+    MyDB_PagePtr page = make_shared <MyDB_Page> (nullptr, this->anonIndex, false, *this, this->globalTimeStamp, false);
+    this->anonIndex += 1;
     this->globalTimeStamp += 1;
     this->page_map[whichPage] = page;
     MyDB_PageHandle handle = make_shared <MyDB_PageHandleBase>(page);
@@ -86,9 +86,9 @@ MyDB_PageHandle MyDB_BufferManager :: getPinnedPage () {
         if (this->evictLRU() == false)
             return nullptr;
     }
-    pair<MyDB_TablePtr, long> whichPage = make_pair(nullptr, this->tempIndex);
-    MyDB_PagePtr page = make_shared <MyDB_Page> (nullptr, this->tempIndex, true, *this, this->globalTimeStamp, false);
-    this->tempIndex += 1;
+    pair<MyDB_TablePtr, long> whichPage = make_pair(nullptr, this->anonIndex);
+    MyDB_PagePtr page = make_shared <MyDB_Page> (nullptr, this->anonIndex, true, *this, this->globalTimeStamp, false);
+    this->anonIndex += 1;
     this->globalTimeStamp += 1;
     this->page_map[whichPage] = page;
     MyDB_PageHandle handle = make_shared <MyDB_PageHandleBase>(page);
@@ -101,10 +101,10 @@ void MyDB_BufferManager :: unpin (MyDB_PageHandle unpinMe) {
 
 MyDB_BufferManager :: MyDB_BufferManager (size_t pageSize, size_t numPages, string tempFile): pageSize(pageSize), numPages(numPages), tempFile(tempFile){
 //    cout << "Table is created" << endl;
-    this->tempIndex = 0;
+    this->anonIndex = 0;
     this->globalTimeStamp = 0;
 	for (size_t i = 0; i < numPages; i++) {
-		buffer.push_back((char*)malloc(pageSize));
+		buffer.push_back(malloc(pageSize));
 	}
 }
 
@@ -137,7 +137,6 @@ void MyDB_BufferManager :: remove(MyDB_Page &page){
         page.setDirty(false);
     }
     page.setBuffered(false);
-//    page.bytes = nullptr;
     buffer.push_back(page.bytes);
 }
 
@@ -208,7 +207,6 @@ bool MyDB_BufferManager :: evictLRU(){
                     page->setDirty(false);
                 }
                 page->setBuffered(false);
-//                page->bytes = nullptr;
                 buffer.push_back(page->bytes);
 //                buffer.push_back((char*)malloc(pageSize));
             }
