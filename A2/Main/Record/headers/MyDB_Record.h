@@ -41,7 +41,7 @@ public:
 	//
 	// void *loc = startLoc;
 	// for (int i = 0; i < 10; i++) {
-	// 	loc = myRec.toBinary (loc);
+	// 	loc = myRecPtr.toBinary (loc);
 	// }
 	// 	
 	// would write 10 copies of the record to the location pointed to by startLoc
@@ -59,7 +59,7 @@ public:
 	//
 	// void *loc = startLoc;
 	// for (int i = 0; i < 10; i++) {
-	// 	loc = myRec.fromBinary (loc);
+	// 	loc = myRecPtr.fromBinary (loc);
 	// }
 	// 	
 	void *fromBinary (void *startPos);
