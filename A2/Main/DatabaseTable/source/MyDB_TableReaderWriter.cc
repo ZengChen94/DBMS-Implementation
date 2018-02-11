@@ -44,8 +44,8 @@ MyDB_PageReaderWriter &MyDB_TableReaderWriter :: last () {
 
 
 void MyDB_TableReaderWriter :: append (MyDB_RecordPtr appendMe){
-	shared_ptr <MyDB_PageReaderWriter> pageReaderWriter = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, this->myTable->lastPage ());
-	if (!pageReaderWriter->append(appendMe)) {
+	shared_ptr <MyDB_PageReaderWriter> pageReaderWriter = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, this->myTable->lastPage());
+	while (!pageReaderWriter->append(appendMe)) {
 		myTable->setLastPage (myTable->lastPage() + 1);
 		pageReaderWriter = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, this->myTable->lastPage());
 		pageReaderWriter->clear();
