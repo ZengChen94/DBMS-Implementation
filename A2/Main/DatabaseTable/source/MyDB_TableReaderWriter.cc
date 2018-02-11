@@ -14,7 +14,7 @@
 using namespace std;
 
 MyDB_TableReaderWriter :: MyDB_TableReaderWriter (MyDB_TablePtr forMe, MyDB_BufferManagerPtr myBuffer): myTable(forMe), myBuffer(myBuffer){
-	if (this->myTable->lastPage() == -1) {
+	if (this->myTable->lastPage() == -1) {// initial
 		this->myTable->setLastPage(0);
 		shared_ptr <MyDB_PageReaderWriter> pageReaderWriter = make_shared <MyDB_PageReaderWriter> (myTable, myBuffer, 0);
 		pageReaderWriter->clear();
@@ -58,13 +58,18 @@ void MyDB_TableReaderWriter :: loadFromTextFile (string fileName) {
 	pageReaderWriter->clear();
 
 	ifstream file(fileName);
-	string line;
-	MyDB_RecordPtr recordPtr = getEmptyRecord();
-	while (getline(file, line)) {
-        recordPtr->fromString(line);
-		append(recordPtr);
+	if (file.is_open()){
+		string line;
+		MyDB_RecordPtr recordPtr = getEmptyRecord();
+		while (getline(file, line)) {
+			recordPtr->fromString(line);
+			append(recordPtr);
+		}
+		file.close ();
 	}
-	file.close ();
+	else {
+		fprintf(stderr, "Failed to open file \'%s\'", fileName.c_str());
+	}
 }
 
 MyDB_RecordIteratorPtr MyDB_TableReaderWriter :: getIterator (MyDB_RecordPtr iterateIntoMe) {
@@ -73,15 +78,20 @@ MyDB_RecordIteratorPtr MyDB_TableReaderWriter :: getIterator (MyDB_RecordPtr ite
 
 void MyDB_TableReaderWriter :: writeIntoTextFile (string fileName) {
     ofstream file(fileName);
-	MyDB_RecordPtr recordPtr = getEmptyRecord();
-	MyDB_RecordIteratorPtr iterator = getIterator(recordPtr);
-	while (iterator->hasNext()) {
-        iterator->getNext();
-        ostringstream stream;
-        stream << recordPtr;
-        file << stream.str() << endl;
-	}
-    file.close ();
+    if (file.is_open()) {
+        MyDB_RecordPtr recordPtr = getEmptyRecord();
+        MyDB_RecordIteratorPtr iterator = getIterator(recordPtr);
+        while (iterator->hasNext()) {
+            iterator->getNext();
+            ostringstream stream;
+            stream << recordPtr;
+            file << stream.str() << endl;
+        }
+        file.close ();
+    }
+    else {
+        fprintf(stderr, "Failed to open file \'%s\'", fileName.c_str());
+    }
 }
 
 #endif

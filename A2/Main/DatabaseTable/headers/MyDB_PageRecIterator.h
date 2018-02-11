@@ -26,11 +26,11 @@ public:
     bool hasNext();
 
     // destructor and contructor
-    MyDB_PageRecIterator (MyDB_PageReaderWriter &myParent, MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr);
+    MyDB_PageRecIterator (MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr);
     ~MyDB_PageRecIterator () {};
 
 private:
-    MyDB_PageReaderWriter &myParent;
+//    MyDB_PageReaderWriter &myParent;
     MyDB_PageHandle myPage;
     MyDB_RecordPtr myRecPtr;
 

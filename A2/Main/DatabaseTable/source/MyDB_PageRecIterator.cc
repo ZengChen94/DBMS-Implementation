@@ -2,7 +2,7 @@
 #ifndef PAGE_REC_ITER_C
 #define PAGE_REC_ITER_C
 
-using namespace std;
+//using namespace std;
 
 #include "../headers/MyDB_PageRecIterator.h"
 
@@ -12,10 +12,14 @@ void MyDB_PageRecIterator::getNext() {
 }
 
 bool MyDB_PageRecIterator::hasNext() {
-    return *((size_t*)(((char*)this->myPage->getBytes()) + sizeof(MyDB_PageType))) != this->offset;
+    // reference: https://piazza.com/class/jc6ed4h5nkg4tz?cid=73
+    if (*((size_t*)(((char*)this->myPage->getBytes()) + sizeof(MyDB_PageType))) != this->offset)
+        return true;
+    else
+        return false;
 }
 
-MyDB_PageRecIterator::MyDB_PageRecIterator (MyDB_PageReaderWriter &myParent, MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr): myParent(myParent), myPage(myPage), myRecPtr(myRecPtr){
+MyDB_PageRecIterator::MyDB_PageRecIterator (MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr): myPage(myPage), myRecPtr(myRecPtr){
     this->offset = sizeof(MyDB_PageType) + sizeof(size_t);// header = pageType + offset
 }
 

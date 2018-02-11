@@ -39,7 +39,7 @@ private:
 
 	// ANYTHING ELSE YOU WANT HERE
 	MyDB_PageHandle myPage;
-	size_t pageSize;
+	MyDB_BufferManagerPtr myBuffer;
 };
 
 #endif
