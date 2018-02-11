@@ -3,6 +3,7 @@
 #define TABLE_RW_C
 
 #include <fstream>
+#include <sstream>
 //#include "MyDB_PageReaderWriter.h"
 //#include "MyDB_TableReaderWriter.h"
 
@@ -56,15 +57,14 @@ void MyDB_TableReaderWriter :: loadFromTextFile (string fileName) {
 	shared_ptr <MyDB_PageReaderWriter> pageReaderWriter = make_shared <MyDB_PageReaderWriter> (myTable, myBuffer, 0);
 	pageReaderWriter->clear();
 
-	ifstream fin;
-	fin.open(fileName);
+	ifstream file(fileName);
 	string line;
-	MyDB_RecordPtr emptyRec = getEmptyRecord ();
-	while (getline(fin, line)) {
-		emptyRec->fromString(line);
-		append(emptyRec);
+	MyDB_RecordPtr recordPtr = getEmptyRecord();
+	while (getline(file, line)) {
+        recordPtr->fromString(line);
+		append(recordPtr);
 	}
-	fin.close ();
+	file.close ();
 }
 
 MyDB_RecordIteratorPtr MyDB_TableReaderWriter :: getIterator (MyDB_RecordPtr iterateIntoMe) {
@@ -72,14 +72,16 @@ MyDB_RecordIteratorPtr MyDB_TableReaderWriter :: getIterator (MyDB_RecordPtr ite
 }
 
 void MyDB_TableReaderWriter :: writeIntoTextFile (string fileName) {
-	ofstream fout;
-	fout.open(fileName);
-	MyDB_RecordPtr emptyRec = getEmptyRecord();
-	MyDB_RecordIteratorPtr recIter = getIterator(emptyRec);
-	while (recIter->hasNext()) {
-		recIter->getNext();
+    ofstream file(fileName);
+	MyDB_RecordPtr recordPtr = getEmptyRecord();
+	MyDB_RecordIteratorPtr iterator = getIterator(recordPtr);
+	while (iterator->hasNext()) {
+        iterator->getNext();
+        ostringstream stream;
+        stream << recordPtr;
+        file << stream.str() << endl;
 	}
-	fout.close ();
+    file.close ();
 }
 
 #endif
