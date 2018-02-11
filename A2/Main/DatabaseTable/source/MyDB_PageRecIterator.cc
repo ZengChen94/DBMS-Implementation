@@ -12,7 +12,7 @@ void MyDB_PageRecIterator::getNext() {
 }
 
 bool MyDB_PageRecIterator::hasNext() {
-//    maybe need to refer to: https://piazza.com/class/jc6ed4h5nkg4tz?cid=73
+    return *((size_t*)(((char*)this->myPage->getBytes()) + sizeof(MyDB_PageType))) != this->offset;
 }
 
 MyDB_PageRecIterator::MyDB_PageRecIterator (MyDB_PageReaderWriter &myParent, MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr): myParent(myParent), myPage(myPage), myRecPtr(myRecPtr){

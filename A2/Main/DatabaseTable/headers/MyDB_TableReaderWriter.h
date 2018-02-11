@@ -11,12 +11,16 @@
 #include "../../BufferMgr/headers/MyDB_BufferManager.h"
 #include "../../Record/headers/MyDB_Record.h"
 #include "../../Catalog/headers/MyDB_Table.h"
+#include "../../DatabaseTable/headers/MyDB_PageReaderWriter.h"
+
+#include <map>
 
 // create a smart pointer for the catalog
 using namespace std;
 class MyDB_PageReaderWriter;
 class MyDB_TableReaderWriter;
 typedef shared_ptr <MyDB_TableReaderWriter> MyDB_TableReaderWriterPtr;
+typedef shared_ptr <MyDB_PageReaderWriter> MyDB_PageReaderWriterPtr;
 
 class MyDB_TableReaderWriter {
 
@@ -56,6 +60,8 @@ private:
 	// ANYTHING YOU NEED HERE
 	MyDB_TablePtr myTable;
 	MyDB_BufferManagerPtr myBuffer;
+//	MyDB_PageReaderWriterPtr pageReaderWriter;
+	map<int, MyDB_PageReaderWriterPtr> pageReaderWriterMap;
 };
 
 #endif

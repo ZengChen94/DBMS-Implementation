@@ -27,8 +27,10 @@ MyDB_PageReaderWriter &MyDB_TableReaderWriter :: operator [] (size_t i) {
 		pageReaderWriter = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, this->myTable->lastPage());
 		pageReaderWriter->clear();
 	}
-	pageReaderWriter = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, i);
-	return *pageReaderWriter;
+//	this->pageReaderWriter = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, i);
+//	return *this->pageReaderWriter;
+	this->pageReaderWriterMap[i] = make_shared <MyDB_PageReaderWriter> (this->myTable, this->myBuffer, i);
+	return *this->pageReaderWriterMap[i];
 }
 
 MyDB_RecordPtr MyDB_TableReaderWriter :: getEmptyRecord () {
