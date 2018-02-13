@@ -19,7 +19,7 @@ bool MyDB_TableRecIterator::hasNext() {
     while (this->page_index < this->myTablePtr->lastPage()) {
         this->page_index += 1;
         this->myPageIter = this->myParent[this->page_index].getIterator(this->myRecPtr);
-        if (this->myPageIter->hasNext()){
+        if (this->myPageIter->hasNext()) {
             return true;
         }
     }
@@ -35,9 +35,12 @@ bool MyDB_TableRecIterator::hasNext() {
     return false;
 }
 
-MyDB_TableRecIterator::MyDB_TableRecIterator (MyDB_TableReaderWriter &myParent, MyDB_TablePtr myTablePtr, MyDB_RecordPtr myRecPtr):myParent(myParent), myTablePtr(myTablePtr), myRecPtr(myRecPtr){
+MyDB_TableRecIterator::MyDB_TableRecIterator(MyDB_TableReaderWriter &myParent, MyDB_TablePtr myTablePtr,
+                                             MyDB_RecordPtr myRecPtr) : myParent(myParent), myTablePtr(myTablePtr),
+                                                                        myRecPtr(myRecPtr) {
     this->page_index = 0;
-    this->myPageIter = this->myParent[this->page_index].getIterator(this->myRecPtr);// get the 0^th page and return the pageIterator
+    this->myPageIter = this->myParent[this->page_index].getIterator(
+            this->myRecPtr);// get the 0^th page and return the pageIterator
 }
 
 #endif

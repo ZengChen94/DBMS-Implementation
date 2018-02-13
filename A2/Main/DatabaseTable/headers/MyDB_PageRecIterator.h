@@ -3,6 +3,7 @@
 #define PAGE_REC_ITER_H
 
 #include <memory>
+
 using namespace std;
 
 #include "../../BufferMgr/headers/MyDB_Page.h"
@@ -12,9 +13,10 @@ using namespace std;
 #include "../../Record/headers/MyDB_Record.h"
 
 class MyDB_PageRecIterator;
-typedef shared_ptr <MyDB_PageRecIterator> MyDB_PageRecIteratorPtr;
 
-class MyDB_PageRecIterator: public MyDB_RecordIterator {
+typedef shared_ptr<MyDB_PageRecIterator> MyDB_PageRecIteratorPtr;
+
+class MyDB_PageRecIterator : public MyDB_RecordIterator {
 
 public:
 
@@ -26,8 +28,9 @@ public:
     bool hasNext();
 
     // destructor and contructor
-    MyDB_PageRecIterator (MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr);
-    ~MyDB_PageRecIterator () {};
+    MyDB_PageRecIterator(MyDB_PageHandle myPage, MyDB_RecordPtr myRecPtr);
+
+    ~MyDB_PageRecIterator() {};
 
 private:
 //    MyDB_PageReaderWriter &myParent;

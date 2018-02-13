@@ -3,6 +3,7 @@
 #define TABLE_REC_ITER_H
 
 #include <memory>
+
 using namespace std;
 
 #include "../../Catalog/headers/MyDB_Table.h"
@@ -11,9 +12,10 @@ using namespace std;
 #include "../../Record/headers/MyDB_Record.h"
 
 class MyDB_TableRecIterator;
-typedef shared_ptr <MyDB_TableRecIterator> MyDB_TableRecIteratorPtr;
 
-class MyDB_TableRecIterator: public MyDB_RecordIterator {
+typedef shared_ptr<MyDB_TableRecIterator> MyDB_TableRecIteratorPtr;
+
+class MyDB_TableRecIterator : public MyDB_RecordIterator {
 
 public:
 
@@ -25,8 +27,9 @@ public:
     bool hasNext();
 
     // destructor and contructor
-    MyDB_TableRecIterator (MyDB_TableReaderWriter &myParent, MyDB_TablePtr myTablePtr, MyDB_RecordPtr myRecPtr);
-    ~MyDB_TableRecIterator () {};
+    MyDB_TableRecIterator(MyDB_TableReaderWriter &myParent, MyDB_TablePtr myTablePtr, MyDB_RecordPtr myRecPtr);
+
+    ~MyDB_TableRecIterator() {};
 
 private:
 
