@@ -225,7 +225,7 @@ int main (int argc, char *argv[]) {
 			low->set (i * 19);
 			MyDB_IntAttValPtr high = make_shared <MyDB_IntAttVal> ();
 			high->set (i * 19);
-	
+
 			MyDB_RecordIteratorAltPtr myIter = supplierTable.getSortedRangeIteratorAlt (low, high);
 			while (myIter->advance ()) {
 				myIter->getCurrent (temp);
@@ -260,7 +260,7 @@ int main (int argc, char *argv[]) {
 			low->set (string (&a));
 			MyDB_StringAttValPtr high = make_shared <MyDB_StringAttVal> ();
 			high->set (string (&a));
-	
+
 			MyDB_RecordIteratorAltPtr myIter = supplierTable.getSortedRangeIteratorAlt (low, high);
 			while (myIter->advance ()) {
 				myIter->getCurrent (temp);
@@ -290,7 +290,7 @@ int main (int argc, char *argv[]) {
 			low->set (i);
 			MyDB_IntAttValPtr high = make_shared <MyDB_IntAttVal> ();
 			high->set (i);
-	
+
 			MyDB_RecordIteratorAltPtr myIter = supplierTable.getSortedRangeIteratorAlt (low, high);
 			while (myIter->advance ()) {
 				myIter->getCurrent (temp);
@@ -321,39 +321,39 @@ int main (int argc, char *argv[]) {
 		bool allOK = true;
 		for (int time = 0; time < 2; time++) {
 			for (int i = 0; i < 100; i++) {
-	
+
 				// we are looping through twice; the first time, ask only point queries
 				srand48 (i);
 				int lowBound = lrand48 () % 10000;
 				int highBound = lrand48 () % 10000;
 				if (time % 2 == 0)
 					highBound = lowBound;
-	
+
 				// make sure the low bound is less than the high bound
 				if (lowBound > highBound) {
 					int temp = lowBound;
 					lowBound = highBound;
 					highBound = temp;
 				}
-	
+
 				// ask a range query
 				MyDB_IntAttValPtr low = make_shared <MyDB_IntAttVal> ();
 				low->set (lowBound);
 				MyDB_IntAttValPtr high = make_shared <MyDB_IntAttVal> ();
 				high->set (highBound);
 
-				if (i % 2 == 0) 
+				if (i % 2 == 0)
 					myIter = supplierTable.getRangeIteratorAlt (low, high);
 				else
 					myIter = supplierTable.getSortedRangeIteratorAlt (low, high);
-		
+
 				// verify we got exactly the correct count back
 				int counter = 0;
        		         	while (myIter->advance ()) {
        		                	myIter->getCurrent (temp);
 					counter++;
        	         		}
-	
+
 				if (counter != 32 * (highBound - lowBound + 1))
 					allOK = false;
 			}

@@ -63,7 +63,7 @@ private:
 	// splits the given page (plus the record andMe) around the median.  A MyDB_INRecordPtr is returned that
 	// points to the record holding the (key, ptr) pair pointing to the new page.  Note that the new page
 	// always holds the lower 1/2 of the records on the page; the upper 1/2 remains in the original page
-	MyDB_RecordPtr split (int splitMe, MyDB_RecordPtr andMe);
+	MyDB_RecordPtr split (MyDB_PageReaderWriter splitMe, MyDB_RecordPtr andMe);
 
 	// constructs and returns an empty internal node record for this particular tree
 	MyDB_INRecordPtr getINRecord ();

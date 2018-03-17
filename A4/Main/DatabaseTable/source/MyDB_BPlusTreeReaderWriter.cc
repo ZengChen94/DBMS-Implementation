@@ -102,14 +102,12 @@ void MyDB_BPlusTreeReaderWriter::append(MyDB_RecordPtr rec) {
         rootPage.setType(MyDB_PageType::DirectoryPage);
         MyDB_INRecordPtr ptr = getINRecord();
 
-//        int newPageLoc = getTable()->lastPage() + 1;
-        int newPageLoc = 1;
+        int newPageLoc = getTable()->lastPage() + 1;
         getTable()->setLastPage(newPageLoc);
         MyDB_PageReaderWriter leafPage = (*this)[newPageLoc];
         leafPage.clear();
         leafPage.setType(MyDB_PageType::RegularPage);
         ptr->setPtr(newPageLoc);
-
         rootPage.append(ptr);
     }
     MyDB_RecordPtr ret = append(this->rootLocation, rec);
@@ -131,9 +129,8 @@ void MyDB_BPlusTreeReaderWriter::append(MyDB_RecordPtr rec) {
     }
 }
 
-MyDB_RecordPtr MyDB_BPlusTreeReaderWriter::split(int whichPage, MyDB_RecordPtr addMe) {
+MyDB_RecordPtr MyDB_BPlusTreeReaderWriter::split(MyDB_PageReaderWriter splitMe, MyDB_RecordPtr addMe) {
     MyDB_INRecordPtr newPtr = getINRecord();
-    MyDB_PageReaderWriter splitMe = (*this)[whichPage];
     //init 2 new page
     int newPageLoc = getTable()->lastPage() + 1;
     getTable()->setLastPage(newPageLoc);
@@ -303,7 +300,7 @@ MyDB_RecordPtr MyDB_BPlusTreeReaderWriter::append(int whichPage, MyDB_RecordPtr 
             page.sortInPlace(myComparator, in1, in2);
             return nullptr;
         } else {
-            auto f = split(whichPage, appendMe);
+            auto f = split((*this)[whichPage], appendMe);
 //            cout << "split inner page ";
 //            cout << whichPage << endl;
             return f;
@@ -314,7 +311,7 @@ MyDB_RecordPtr MyDB_BPlusTreeReaderWriter::append(int whichPage, MyDB_RecordPtr 
             if (page.append(appendMe)) {
                 return nullptr;
             } else {
-                auto f = split(whichPage, appendMe);
+                auto f = split((*this)[whichPage], appendMe);
                 return f;
             }
         } else {
