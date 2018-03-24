@@ -1,0 +1,33 @@
+1. The query is valid.
+
+2. Error: Selected attribute [s_s_suppkey] is not in grouping attributes.
+
+3. Error: In Greater Operation, the type of lhs * ([l_l_extendedprice], - (int[1], [l_l_discount])) and the type of rhs string[a string] are not the same.
+
+4. Error: In Sum Operation, the type of child + ([l_l_returnflag], + ([l_l_shipdate], [l_l_commitdate])) is not NUMERIC TYPE.
+
+5. The query is valid.
+
+6. Error: In Greater Operation, the type of lhs + ([l_l_tax], [l_l_discount]) and the type of rhs string[date2] are not the same.
+
+7. Error: The attribute k_orderkey doesn't exist in table orders.
+
+8. Error: Table identifier h is unknown.
+
+9. Error: In Minus Operation, the rhs string[here is another] is not Numeric Type
+
+10. Error: The attribute c_custkey doesn't exist in table customers.
+
+11. The query is valid.
+
+12. The query is valid.
+
+13. Error: The attribute l_extendedprice doesn't exist in table customer.
+
+14. The query is valid.
+
+15. Error: In Greater Operation, the type of lhs + ([l_l_discount], [l_l_extendedprice]) and the type of rhs string[327] are not the same.
+
+16. The query is valid.
+
+17. The query is valid.
