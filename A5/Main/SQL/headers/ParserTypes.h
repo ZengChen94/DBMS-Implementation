@@ -275,19 +275,20 @@ public:
 		}
 
 //        Task4
-        unordered_set<string> groupAttSet;
-        for (auto groupingClause : groupingClauses) {
-            if(groupingClause->getType().compare("IDENTIFIER") == 0) {
-                groupAttSet.insert(groupingClause->toString());
-            }
-        }
-        if(groupAttSet.size() != 0) {
-            for(auto valueToSelect : valuesToSelect) {
-                if(valueToSelect->getType().compare("IDENTIFIER") == 0 && groupAttSet.find(valueToSelect->toString()) == groupAttSet.end()) {
-                    cout << "Error: Selected attribute " << valueToSelect->toString() << " is not in grouping attributes." << endl;
+        for (auto valueToSelect : valuesToSelect) {
+        	if (valueToSelect->getType().compare("IDENTIFIER") == 0) {
+        		bool flag2 = false;
+        		for (auto groupingClause : groupingClauses) {
+        			if (groupingClause->getType().compare("IDENTIFIER") == 0 && valueToSelect->toString().compare(groupingClause->toString()) == 0) {
+        				flag2 = true;
+        				break;
+        			}
+        		}
+        		if (!flag2) {
+        			cout << "Error: Selected attribute " << valueToSelect->toString() << " is not in grouping attributes." << endl;
                     return;
-                }
-            }
+        		}
+        	}
         }
 
         for(auto valueToSelect : valuesToSelect) {
