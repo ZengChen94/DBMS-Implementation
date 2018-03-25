@@ -1,15 +1,15 @@
 ## COMP 530: Database System Implementation
 
-####Introduction
+### Introduction
 
 This repo is for assignments of 17Fall COMP 530: Database System Implementation. The whole work of these assignments are about database management system architecture, buffer management, query processing and optimization, transaction processing, concurrency control and recovery, data storage, indexing structures, and related topics. They're all about C++ and DBMS.
 
-####Authors
+### Authors
 
 * Chen Zeng (cz39)
 * Yuanqing Zhu (yz120)
 
-####Contents
+### Contents
 
 * A0 C++ Warm-Up: out Monday
 * A1 Buffer and file management
@@ -20,7 +20,7 @@ This repo is for assignments of 17Fall COMP 530: Database System Implementation.
 * A7 Putting it all together
 * A8 Multi-threading
 
-####Usage
+### Usage
 
 To get any credit on these assignments, the code must be compiled and run on Clear. 
 
