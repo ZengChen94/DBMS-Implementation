@@ -263,15 +263,16 @@ public:
 		bool flag = false;
 		for (auto tableToProcess : tablesToProcess) {
 			for (auto tableName : tablesList) {
-				if (tableName == tableToProcess.first) {
+				if (tableName.compare(tableToProcess.first) == 0) {
 					flag = true;
 					break;
 				}
 			}
 			if (!flag) {
-				cout << "Error: Table " + tableToProcess.first + " cannot be found in database.";
+				cout << "Error: Table " + tableToProcess.first + " cannot be found in database." << endl;
 				return;
 			}
+			flag = false;
 		}
 
 //        Task4

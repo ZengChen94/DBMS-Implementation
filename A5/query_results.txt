@@ -16,7 +16,7 @@
 
 9. Error: In Minus Operation, the rhs string[here is another] is not Numeric Type
 
-10. Error: The attribute c_custkey doesn't exist in table customers.
+10. Table customers cannot be found in database.
 
 11. The query is valid.
 
