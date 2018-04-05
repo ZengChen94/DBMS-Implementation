@@ -11,8 +11,9 @@ This repo is for assignments of 17Fall COMP 530: Database System Implementation.
 
 ### Contents
 
-* A0 C++ Warm-Up: out Monday
+* A0 C++ Warm-Up
 * A1 Buffer and file management
+* A2 Record manager
 * A3 Sorted file implementation
 * A4 B+-tree implementation
 * A5 SQL type checking
