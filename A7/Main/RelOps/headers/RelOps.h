@@ -21,6 +21,7 @@ public:
     RelOps(SQLStatement *inSql, MyDB_CatalogPtr inCatalog, map <string, MyDB_TableReaderWriterPtr> inTables, MyDB_BufferManagerPtr inMgr);
     void execute();
     string cutPrefix(string input, string alias);
+    vector<string> splitRes(string input);
 
 private:
     SQLStatement *mySql;

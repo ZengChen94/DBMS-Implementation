@@ -2,9 +2,11 @@
 // Created by Chen Zeng on 4/23/18.
 //
 
-#include "RelOps.h"
+#include "../headers/RelOps.h"
+#include <sstream>
+#include <unordered_map>
 
-RelOps :: RelOps(SQLStatement *inSql, MyDB_CatalogPtr inCatalog, map <string, MyDB_TableReaderWriterPtr> inTables, MyDB_BufferManagerPtr inMgr){
+RelOps::RelOps(SQLStatement *inSql, MyDB_CatalogPtr inCatalog, map <string, MyDB_TableReaderWriterPtr> inTables, MyDB_BufferManagerPtr inMgr){
     mySql = inSql;
     myCatalog = inCatalog;
     myTables = inTables;
@@ -57,6 +59,34 @@ void RelOps::execute() {
         return;
     }
 
+
+    vector <ExprTreePtr> aggVector;
+    vector <ExprTreePtr> nonAggVector;
+    unordered_map<int, int> orderMap; //oldIndex, newIndex
+    int cntNonAgg = 0;
+    int cntAgg = 0;
+    for (auto v : valuesToSelect) {
+        if (v->getType().compare("SUM") != 0 && v->getType().compare("AVG") != 0) {
+            cntNonAgg += 1;
+        }
+    }
+    cntAgg = cntNonAgg;
+    cntNonAgg = 0;
+    int cnt = 0;
+    for (auto v : valuesToSelect) {
+        if (v->getType().compare("SUM") == 0 || v->getType().compare("AVG") == 0) {
+            aggVector.push_back(v);
+            orderMap[cnt++] = cntAgg++;
+        }
+        else {
+            nonAggVector.push_back(v);
+            orderMap[cnt++] = cntNonAgg++;
+        }
+    }
+    valuesToSelect.clear();
+    valuesToSelect.insert(valuesToSelect.end(), nonAggVector.begin(), nonAggVector.end());
+    valuesToSelect.insert(valuesToSelect.end(), aggVector.begin(), aggVector.end());
+
     MyDB_SchemaPtr mySchemaOut = make_shared <MyDB_Schema> ();
 
     vector <string> projections;
@@ -65,7 +95,6 @@ void RelOps::execute() {
     for (auto v : valuesToSelect) {
         projections.push_back(cutPrefix(v->toString(), tableAlias));
         mySchemaOut->appendAtt(v->getAttPair(myCatalog, tableName));
-//        cout << v->getAttPair(myCatalog, tableName).second->toString() << endl;
 
         if(v->getType().compare("SUM") == 0){
             aggsToCompute.push_back(make_pair(MyDB_AggType::SUM, cutPrefix(v->toString(), tableAlias).substr(3)));
@@ -73,10 +102,15 @@ void RelOps::execute() {
         else if(v->getType().compare("AVG") == 0){
             aggsToCompute.push_back(make_pair(MyDB_AggType::AVG, cutPrefix(v->toString(), tableAlias).substr(3)));
         }
-        else{
+
+        if (v->getType().compare("SUM") != 0 && v->getType().compare("AVG") != 0){
             groupings.push_back(cutPrefix(v->toString(), tableAlias));
         }
     }
+
+//    for (auto g : groupingClauses) {
+//        groupings.push_back(cutPrefix(g->toString(), tableAlias));
+//    }
 
     MyDB_TablePtr myTableOut = make_shared <MyDB_Table> ("output", "output.bin", mySchemaOut);
     MyDB_TableReaderWriterPtr outputTable = make_shared <MyDB_TableReaderWriter> (myTableOut, myMgr);
@@ -92,7 +126,19 @@ void RelOps::execute() {
         }
     }
 
-    cout << selectionPredicate << endl;
+//    for (auto a : aggsToCompute) {
+//        if (a.first == MyDB_AggType::SUM)
+//            cout << "AGG: SUM, " + a.second << endl;
+//        else if (a.first == MyDB_AggType::AVG)
+//            cout << "AGG: AVG, " + a.second << endl;
+//        else
+//            cout << "AGG: ???, " + a.second << endl;
+//    }
+//    for (auto g : groupings) {
+//        cout << "GROUPING: " + g << endl;
+//    }
+//    cout << "SELECTION: " << selectionPredicate << endl;
+//    return;
 
     if(aggsToCompute.size() == 0) {
         RegularSelection regularSelection (inputTable, outputTable, selectionPredicate, projections);
@@ -106,15 +152,22 @@ void RelOps::execute() {
     MyDB_RecordPtr temp = outputTable->getEmptyRecord ();
     MyDB_RecordIteratorAltPtr myIter = outputTable->getIteratorAlt ();
     while (myIter->advance ()) {
+        stringstream buffer;
         myIter->getCurrent (temp);
-        cout << temp << "\n";
+        buffer << temp;
+//        cout << buffer.str() << endl;
+        vector<string> res = splitRes(buffer.str());
+        for (int i = 0; i < res.size(); i++) {
+            cout << res[orderMap[i]] << "|";
+        }
+        cout << endl;
     }
-}
 
-//string RelOps::cutPrefix(string input, string alias) {
-//    size_t start_pos = input.find("["+alias+"_");
-//    return input.substr(0, start_pos) + "[" + input.substr(start_pos+2+alias.length());
-//}
+    if(remove("./output.bin" ) != 0)
+        perror("Error deleting file");
+    else
+        puts("File successfully deleted");
+}
 
 string RelOps::cutPrefix(string input, string alias) {
     size_t start_pos = input.find("["+alias+"_"+alias+"_");
@@ -123,4 +176,15 @@ string RelOps::cutPrefix(string input, string alias) {
         start_pos = input.find("["+alias+"_"+alias+"_");
     }
     return input;
+}
+
+vector<string> RelOps::splitRes(string input){
+    vector<string> res;
+    size_t start_pos = input.find("|");
+    while (start_pos != std::string::npos) {
+        res.push_back(input.substr(0, start_pos));
+        input = input.substr(start_pos+1);
+        start_pos = input.find("|");
+    }
+    return res;
 }

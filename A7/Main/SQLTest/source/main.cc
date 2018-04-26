@@ -10,7 +10,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
-#include "RelOps.h"
+#include "../../RelOps/headers/RelOps.h"
 
 using namespace std;
 string toLower (string data) {

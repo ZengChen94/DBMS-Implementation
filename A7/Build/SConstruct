@@ -82,9 +82,13 @@ if ans=="4":
 	print("\nOK, building B+-Tree unit tests.")
 	common_env.Program ('bin/bPlusUnitTest', ['../Main/BPlusTest/source/BPlusQUnit.cc', tableSrc, recordSrc, catalogSrc, bufferSrc])
 
+# if ans=="5":
+# 	print("\nOK, building sql compiler.")
+# 	common_env.Program ('bin/sqlUnitTest', ['../Main/SQLTest/source/main.cc', relOpSrc, tableSrc, sqlSrc, recordSrc, catalogSrc, bufferSrc])
+
 if ans=="5":
-	print("\nOK, building sql compiler.")
-	common_env.Program ('bin/sqlUnitTest', ['../Main/SQLTest/source/main.cc', relOpSrc, tableSrc, sqlSrc, recordSrc, catalogSrc, bufferSrc])
+    print("\nOK, building sql compiler.")
+    common_env.Program ('bin/sqlUnitTest', ['../Main/SQLTest/source/main.cc', relOpSrc, tableSrc, sqlSrc, recordSrc, catalogSrc, bufferSrc], LIBS = ['pthread'], LIBPATH = '')
 
 if ans=="6":
 	print("\nOK, building rel op unit tests.")
