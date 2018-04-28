@@ -141,7 +141,9 @@ void RelOps::execute() {
 //    return;
 
     if(aggsToCompute.size() == 0) {
-        RegularSelection regularSelection (inputTable, outputTable, selectionPredicate, projections);
+//        RegularSelection regularSelection (inputTable, outputTable, selectionPredicate, projections);
+//        regularSelection.run();
+        RegularSelectionMultiThread regularSelection(inputTable, outputTable, selectionPredicate, projections, 4);
         regularSelection.run();
     }
     else {
@@ -163,10 +165,11 @@ void RelOps::execute() {
         cout << endl;
     }
 
-    if(remove("./output.bin" ) != 0)
-        perror("Error deleting file");
-    else
-        puts("File successfully deleted");
+//    if(remove("./output.bin" ) != 0)
+//        perror("Error deleting file");
+//    else
+//        puts("File successfully deleted");
+    remove("./output.bin" );
 }
 
 string RelOps::cutPrefix(string input, string alias) {

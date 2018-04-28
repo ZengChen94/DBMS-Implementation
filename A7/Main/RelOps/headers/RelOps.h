@@ -12,6 +12,7 @@
 #include "Aggregate.h"
 #include "BPlusSelection.h"
 #include "RegularSelection.h"
+#include "RegularSelectionMultiThread.h"
 #include "ScanJoin.h"
 #include "SortMergeJoin.h"
 
