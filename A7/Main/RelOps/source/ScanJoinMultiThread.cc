@@ -10,7 +10,6 @@
 #include "MyDB_PageReaderWriter.h"
 #include "MyDB_TableReaderWriter.h"
 #include "ScanJoinMultiThread.h"
-#include <unordered_map>
 
 using namespace std;
 
@@ -106,6 +105,21 @@ void ScanJoinMultiThread :: run () {
 
     // and now we iterate through the other table
 
+    int pageNumber = rightTable->getNumPages();
+    int partitionSize = pageNumber / threadNum;
+    vector<thread> threadList;
+    for (int i = 0; i < threadNum; i++) {
+        if (i != threadNum-1)
+            threadList.push_back(thread(&ScanJoinMultiThread::execThread, this, i*partitionSize, (i+1)*partitionSize-1, std::ref(myHash), leftInputRec));
+        else
+            threadList.push_back(thread(&ScanJoinMultiThread::execThread, this, i*partitionSize, pageNumber-1, std::ref(myHash), leftInputRec));
+    }
+    for(auto& thread : threadList) {
+        thread.join();
+    }
+}
+
+void ScanJoinMultiThread :: execThread (int low, int high, unordered_map<size_t, vector<void *>> &myHash, MyDB_RecordPtr leftInputRec) {
     // get the right input record, and get the various functions over it
     MyDB_RecordPtr rightInputRec = rightTable->getEmptyRecord ();
     vector <func> rightEqualities;
@@ -140,10 +154,14 @@ void ScanJoinMultiThread :: run () {
     MyDB_RecordPtr outputRec = output->getEmptyRecord ();
 
     // now, iterate through the right table
-    MyDB_RecordIteratorPtr myIterAgain = rightTable->getIterator (rightInputRec);
-    while (myIterAgain->hasNext ()) {
+//    MyDB_RecordIteratorPtr myIterAgain = rightTable->getIterator (rightInputRec);
+    MyDB_RecordIteratorAltPtr myIterAgain = rightTable->getIteratorAlt (low, high);
+//    while (myIterAgain->hasNext ()) {
+//
+//        myIterAgain->getNext ();
+    while (myIterAgain->advance()) {
 
-        myIterAgain->getNext ();
+        myIterAgain->getCurrent(rightInputRec);
 
         // see if it is accepted by the preicate
         if (!rightPred ()->toBool ()) {
@@ -190,10 +208,6 @@ void ScanJoinMultiThread :: run () {
             }
         }
     }
-}
-
-void ScanJoinMultiThread :: execThread () {
-
 }
 
 #endif

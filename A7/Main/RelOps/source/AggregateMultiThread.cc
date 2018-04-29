@@ -5,7 +5,6 @@
 #include "MyDB_PageReaderWriter.h"
 #include "MyDB_TableReaderWriter.h"
 #include "AggregateMultiThread.h"
-#include <unordered_map>
 
 using namespace std;
 
@@ -22,7 +21,21 @@ AggregateMultiThread :: AggregateMultiThread (MyDB_TableReaderWriterPtr inputIn,
 }
 
 void AggregateMultiThread :: run () {
+    int pageNumber = input->getNumPages();
+    int partitionSize = pageNumber / threadNum;
+    vector<thread> threadList;
+    for (int i = 0; i < threadNum; i++) {
+        if (i != threadNum-1)
+            threadList.push_back(thread(&AggregateMultiThread::execThread, this, i*partitionSize, (i+1)*partitionSize-1));
+        else
+            threadList.push_back(thread(&AggregateMultiThread::execThread, this, i*partitionSize, pageNumber-1));
+    }
+    for(auto& thread : threadList) {
+        thread.join();
+    }
+}
 
+void AggregateMultiThread :: execThread (int low, int high) {
     // make sure that the number of attributes is OK
     if (output->getTable ()->getSchema ()->getAtts ().size () != aggsToCompute.size () + groupings.size ()) {
         cout << "error, the output schema needs to have the same number of atts as (# of aggs to compute + # groups).\n";
@@ -117,8 +130,11 @@ void AggregateMultiThread :: run () {
     // and this runs the selection on the input records
     func inputPred = inputRec->compileComputation (selectionPredicate);
 
+
+
     // at this point, we are ready to go!!
     MyDB_RecordIteratorPtr myIter = input->getIterator (inputRec);
+
     MyDB_AttValPtr zero = make_shared <MyDB_IntAttVal> ();
     while (myIter->hasNext ()) {
 
@@ -215,8 +231,4 @@ void AggregateMultiThread :: run () {
         outRec->recordContentHasChanged ();
         output->append (outRec);
     }
-}
-
-void AggregateMultiThread :: execThread () {
-
 }

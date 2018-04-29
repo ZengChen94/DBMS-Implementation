@@ -9,6 +9,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <unordered_map>
+#include <thread>
 
 // This class encapulates a scan join, where one table is hashed, and then the
 // other is scanned and joined with the hashed table.  If the smaller table is
@@ -88,7 +90,7 @@ public:
 
     // execute the join
     void run ();
-    void execThread ();
+    void execThread (int low, int high, unordered_map<size_t, vector<void *>> &myHash, MyDB_RecordPtr leftInputRec);
 
 private:
 

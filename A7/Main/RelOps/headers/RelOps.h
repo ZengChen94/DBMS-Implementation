@@ -12,7 +12,6 @@
 #include "Aggregate.h"
 #include "BPlusSelection.h"
 #include "RegularSelection.h"
-#include "RegularSelectionMultiThread.h"
 #include "ScanJoin.h"
 #include "SortMergeJoin.h"
 
@@ -21,8 +20,9 @@ class RelOps {
 public:
     RelOps(SQLStatement *inSql, MyDB_CatalogPtr inCatalog, map <string, MyDB_TableReaderWriterPtr> inTables, MyDB_BufferManagerPtr inMgr);
     void execute();
-    string cutPrefix(string input, string alias);
+//    string cutPrefix(string input, string alias);
     vector<string> splitRes(string input);
+    string constructPredicate(vector<string> allPredicates);
 
 private:
     SQLStatement *mySql;
