@@ -10,6 +10,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <thread>
+#include <unordered_map>
 
 // This class encapulates a simple, hash-based aggregation + group by.  It does not
 // need to work when there is not enough space in the buffer manager to store all of
@@ -58,7 +60,7 @@ public:
 
     // execute the aggregation
     void run ();
-    void execThread();
+    void execThread(int low, int high);
 
 private:
 
