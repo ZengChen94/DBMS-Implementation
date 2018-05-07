@@ -201,19 +201,18 @@ public:
 // structure that stores an entire SFW query
 struct SFWQuery {
 
-//private:
-//    // the various parts of the SQL query
-//    vector <ExprTreePtr> valuesToSelect;
-//    vector <ExprTreePtr> allDisjunctions;
-//    vector <ExprTreePtr> groupingClauses;
-//    vector <pair <string, string>> tablesToProcess;
+private:
+
 
 public:
-    // the various parts of the SQL query
-    vector <ExprTreePtr> valuesToSelect;
-    vector <ExprTreePtr> allDisjunctions;
-    vector <ExprTreePtr> groupingClauses;
-    vector <pair <string, string>> tablesToProcess;
+
+
+	// the various parts of the SQL query
+	vector <ExprTreePtr> valuesToSelect;
+	vector <pair <string, string>> tablesToProcess;
+	vector <ExprTreePtr> allDisjunctions;
+	vector <ExprTreePtr> groupingClauses;
+
 
 	SFWQuery () {}
 
@@ -265,24 +264,19 @@ public:
 // structure that sores an entire SQL statement
 struct SQLStatement {
 
-//private:
-//
-//	// in case we are a SFW query
-//    SFWQuery myQuery;
-//	bool isQuery;
-//
-//	// in case we a re a create table
-//	CreateTable myTableToCreate;
-//	bool isCreate;
+private:
+
 
 public:
-    // in case we are a SFW query
-    SFWQuery myQuery;
-    bool isQuery;
 
-    // in case we a re a create table
-    CreateTable myTableToCreate;
-    bool isCreate;
+	// in case we are a SFW query
+	SFWQuery myQuery;
+	bool isQuery;
+
+	// in case we a re a create table
+	CreateTable myTableToCreate;
+	bool isCreate;
+
 
 	SQLStatement (struct SFWQuery* useMe) {
 		myQuery = *useMe;

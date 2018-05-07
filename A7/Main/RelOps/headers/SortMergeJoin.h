@@ -26,7 +26,7 @@ public:
 	// Next, the pair equalityCheck encodes a pair of computations, taken from the 
 	// predicte finalSelectionPredicate, that must match from the left and the right 
 	// records, in order for the final record to be accepted by the predicate.
-	// Basically, to execute the join, you sort the left relation using equalityCheck.first.
+	// Basically, to run the join, you sort the left relation using equalityCheck.first.
 	// You sort the right relation using equalityCheck.second.  Then you merge them
 	// using equalityCheck.first and equalityCheck.second.
 	//

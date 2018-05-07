@@ -98,11 +98,11 @@ int main () {
 
 		// now, we count the total number of records 
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
-		mySchemaOutAgain->appendAtt (make_pair ("mycnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("myCNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 
@@ -150,11 +150,11 @@ int main () {
 
 		// now, we count the total number of records 
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
-		mySchemaOutAgain->appendAtt (make_pair ("mycnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("myCNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 
@@ -233,14 +233,14 @@ int main () {
 
 		// now, we count the total number of records with each nation name
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		groupings.push_back ("[l_name]");
 
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
 		mySchemaOutAgain->appendAtt (make_pair ("l_name", make_shared <MyDB_StringAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("mycnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("myCNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 
@@ -316,9 +316,9 @@ int main () {
 
 	{
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: avg, "* ([r_suppkey], double[1.0])"));
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: avg, "[r_acctbal]"));
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: AVG, "* ([r_suppkey], double[1.0])"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: AVG, "[r_acctbal]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		groupings.push_back ("[r_suppkey]");
@@ -327,9 +327,9 @@ int main () {
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
 		mySchemaOutAgain->appendAtt (make_pair ("r_suppkey", make_shared <MyDB_IntAttType> ()));
 		mySchemaOutAgain->appendAtt (make_pair ("r_name", make_shared <MyDB_StringAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("r_suppkey_avg", make_shared <MyDB_DoubleAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("r_acctbal_avg", make_shared <MyDB_DoubleAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("r_cnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("r_suppkey_AVG", make_shared <MyDB_DoubleAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("r_acctbal_AVG", make_shared <MyDB_DoubleAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("r_CNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 
@@ -358,18 +358,18 @@ int main () {
 
 	{
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: avg, "* ([r_suppkey], double[1.0])"));
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: avg, "[r_acctbal]"));
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: AVG, "* ([r_suppkey], double[1.0])"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: AVG, "[r_acctbal]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		groupings.push_back ("/ ([r_suppkey], int[100])");
 
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
 		mySchemaOutAgain->appendAtt (make_pair ("r_suppkey", make_shared <MyDB_IntAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("r_suppkey_avg", make_shared <MyDB_DoubleAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("r_acctbal_avg", make_shared <MyDB_DoubleAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("r_cnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("r_suppkey_AVG", make_shared <MyDB_DoubleAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("r_acctbal_AVG", make_shared <MyDB_DoubleAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("r_CNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 
@@ -395,22 +395,22 @@ int main () {
 		}
 
 		aggsToCompute.clear ();
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: sum, "[r_cnt]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: SUM, "[r_CNT]"));
 
 		groupings.clear ();
 		
 		MyDB_SchemaPtr mySchemaOutAgainAgain = make_shared <MyDB_Schema> ();
-		mySchemaOutAgainAgain->appendAtt (make_pair ("final_cnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgainAgain->appendAtt (make_pair ("final_CNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTableFinal = make_shared <MyDB_Table> ("aggOutOut", "aggOutOut.bin", mySchemaOutAgainAgain);
 		MyDB_TableReaderWriterPtr aggTableOutFinal = make_shared <MyDB_TableReaderWriter> (aggTableFinal, myMgr);
 
 		Aggregate myOpOnceAgain (aggTableOut, aggTableOutFinal, aggsToCompute, groupings, "bool [true]");
 		//
-		// Assuming that the output of the last query has the schema (r_suppkey, r_suppkey_avg, r_acctbal_avg, r_cnt)
+		// AsSUMing that the output of the last query has the schema (r_suppkey, r_suppkey_AVG, r_acctbal_AVG, r_CNT)
 		//
 		// This basically runs:
 		//
-		// SELECT SUM (r_cnt)
+		// SELECT SUM (r_CNT)
 		// FROM lastResult
 		//
 		myOpOnceAgain.run ();
@@ -484,13 +484,13 @@ int main () {
 
 		// now, we count the total number of records with each nation name
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		groupings.push_back ("[nation]");
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
 		mySchemaOutAgain->appendAtt (make_pair ("nation", make_shared <MyDB_IntAttType> ()));
-		mySchemaOutAgain->appendAtt (make_pair ("mycnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("myCNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 
@@ -565,11 +565,11 @@ int main () {
 
 		// now, we count the total number of records with each nation name
 		vector <pair <MyDB_AggType, string>> aggsToCompute;
-		aggsToCompute.push_back (make_pair (MyDB_AggType :: cnt, "int[0]"));
+		aggsToCompute.push_back (make_pair (MyDB_AggType :: CNT, "int[0]"));
 
 		vector <string> groupings;
 		MyDB_SchemaPtr mySchemaOutAgain  = make_shared <MyDB_Schema> ();
-		mySchemaOutAgain->appendAtt (make_pair ("mycnt", make_shared <MyDB_IntAttType> ()));
+		mySchemaOutAgain->appendAtt (make_pair ("myCNT", make_shared <MyDB_IntAttType> ()));
 		MyDB_TablePtr aggTable = make_shared <MyDB_Table> ("aggOut", "aggOut.bin", mySchemaOutAgain);
 		MyDB_TableReaderWriterPtr aggTableOut = make_shared <MyDB_TableReaderWriter> (aggTable, myMgr);
 

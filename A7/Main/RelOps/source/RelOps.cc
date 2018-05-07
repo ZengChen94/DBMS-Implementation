@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <set>
+#include <time.h>
 
 RelOps::RelOps(SQLStatement *inSql, MyDB_CatalogPtr inCatalog, map<string, MyDB_TableReaderWriterPtr> inTables,
                MyDB_BufferManagerPtr inMgr) {
@@ -17,6 +18,9 @@ RelOps::RelOps(SQLStatement *inSql, MyDB_CatalogPtr inCatalog, map<string, MyDB_
 }
 
 void RelOps::execute() {
+    time_t start, stop;
+    start = time(NULL);
+
     unordered_map<string, string> nameMap;
     SFWQuery myQuery = mySql->myQuery;
     vector<pair<string, string>> tablesToProcess = myQuery.tablesToProcess;
@@ -35,137 +39,15 @@ void RelOps::execute() {
     }
 
     if (tablesToProcess.size() == 1) {
+        myTables[tablesToProcess[0].first]->getTable()->getSchema()->setAtts(tablesToProcess[0].second);  // rename
         inputTable = myTables[tableName];
-//        inputTable->loadFromTextFile("./"+tableName+".tbl");
-    }
-        // start of join
-    else {
-        string table_name;
-        string table_alias;
-        int num = tablesToProcess.size();
-        //sort
-        vector<pair<unsigned long, int> > vec; //first: number, second: index
-        for (int i = 0; i < num; i++) {
-            unsigned long tmp = myTables[tablesToProcess[i].first]->getTable()->getTupleCount();
-//            cout << "for " << i << "+" << tmp << endl;
-            vec.push_back(make_pair(tmp, i));
-        }
-        set<int> set;
-        sort(vec.begin(), vec.end());
-
-        int s = 0;
-        while (set.size() < num) {
-            int r;
-            MyDB_TableReaderWriterPtr leftTable;
-            string leftTableName, leftTableAlias;
-            if (s == 0) {
-                leftTableName = tablesToProcess[vec[0].second].first;
-                leftTableAlias = tablesToProcess[vec[0].second].second;
-                leftTable = myTables[leftTableName];
-                set.insert(vec[0].second);
-                r = vec[1].second;
-//                leftTable->loadFromTextFile("./" + leftTableName + ".tbl");
-            } else {
-                leftTableName = table_name;
-                leftTableAlias = table_alias;
-                leftTable = inputTable;
-                for (; s < vec.size() - 1; s++) {
-                    if (set.find(vec[s].second) == set.end()) // not found
-                        break;
-                }
-                r = vec[s++].second;
-            }
-            string rightTableName = tablesToProcess[r].first;
-            string rightTableAlias = tablesToProcess[r].second;
-            nameMap[rightTableAlias] = rightTableName;
-            MyDB_TableReaderWriterPtr rightTable = myTables[rightTableName];
-
-//            rightTable->loadFromTextFile("./"+rightTableName+".tbl");
-
-            MyDB_SchemaPtr mySchemaOut = make_shared<MyDB_Schema>();
-
-            vector<string> allProjections;
-            vector<pair<string, MyDB_AttTypePtr>> leftAtts = leftTable->getTable()->getSchema()->getAtts();
-            vector<pair<string, MyDB_AttTypePtr>> rightAtts = rightTable->getTable()->getSchema()->getAtts();
-
-            for (auto &p : leftAtts) {
-                mySchemaOut->appendAtt(p);
-                allProjections.push_back("[" + p.first + "]");
-            }
-            for (auto &p : rightAtts) {
-                mySchemaOut->appendAtt(p);
-                allProjections.push_back("[" + p.first + "]");
-            }
-
-            MyDB_TablePtr myTableOut = make_shared<MyDB_Table>("output_" + to_string(s), "output_" + to_string(s) + ".bin", mySchemaOut);
-            MyDB_TableReaderWriterPtr outputTable = make_shared<MyDB_TableReaderWriter>(myTableOut, myMgr);
-
-            vector<ExprTreePtr> disjunctions = myQuery.allDisjunctions;
-            vector<pair<string, string>> equalityChecks;
-            vector<string> finalPredicates;
-            vector<string> leftPredicates;
-            vector<string> rightPredicates;
-
-            for (auto expr : disjunctions) {
-                pair<bool, string> joinedPair = expr->beJoined();
-                if (joinedPair.first) {
-                    string atts = joinedPair.second;
-                    int pos = atts.find("|");
-                    string leftAtt = atts.substr(0, pos);
-                    string rightAtt = atts.substr(pos + 1, atts.size() - pos - 1);
-                    if ((leftAtt.find(leftTableAlias + "_") == 1) && (rightAtt.find(rightTableAlias + "_") == 1)) {
-                        finalPredicates.push_back(expr->toString());
-                        equalityChecks.emplace_back(make_pair(leftAtt, rightAtt));
-                    } else if ((rightAtt.find(leftTableAlias + "_") == 1) &&
-                               (leftAtt.find(rightTableAlias + "_") == 1)) {
-                        finalPredicates.push_back(expr->toString());
-                        equalityChecks.emplace_back(make_pair(rightAtt, leftAtt));
-                    }
-                } else {
-                    if (joinedPair.second == leftTableAlias)
-                        leftPredicates.push_back(expr->toString());
-                    else if (joinedPair.second == rightTableAlias)
-                        rightPredicates.push_back(expr->toString());
-                }
-            }
-
-            string finalSelectionPredicate = constructPredicate(finalPredicates);
-            string leftSelectionPredicate = constructPredicate(leftPredicates);
-            string rightSelectionPredicate = constructPredicate(rightPredicates);
-
-            if (finalPredicates.empty()){
-                continue;
-            }
-
-            ScanJoin scan(leftTable, rightTable, outputTable,
-                          finalSelectionPredicate, allProjections, equalityChecks, leftSelectionPredicate,
-                          rightSelectionPredicate);
-
-
-//            cout << leftTableAlias << "   " << rightTableAlias << "   " << finalSelectionPredicate << "    "
-//                 << leftSelectionPredicate << "   " << rightSelectionPredicate << endl << endl;
-
-//            for (auto t:allProjections)
-//                cout << t << endl;
-//            cout << endl;
-//            for (auto t:equalityChecks)
-//                cout << t.first << "   " << t.second << endl;
-
-            scan.run();
-
-            inputTable = outputTable;
-            table_name = rightTableName;
-            table_alias = rightTableAlias;
-            set.insert(r);
-            s = 1;
-
-        }
-        cout << "scan join finished" << endl;
+    } else {
+        inputTable = optimize(tablesToProcess, valuesToSelect, allDisjunctions, groupingClauses);
+//        cout << "scan join finished" << endl;
         allDisjunctions.clear();
     }
-// end of join
 
-
+//    cout << "Table result: " << endl;
 //    MyDB_RecordPtr tem3p = inputTable->getEmptyRecord();
 //    MyDB_RecordIteratorAltPtr myIter3 = inputTable->getIteratorAlt();
 //    int counter = 0;
@@ -176,6 +58,7 @@ void RelOps::execute() {
 //        if (counter == 30)
 //            break;
 //    }
+//    cout << "*******************************************" << endl;
 
     vector<ExprTreePtr> aggVector;
     vector<ExprTreePtr> nonAggVector;
@@ -214,8 +97,8 @@ void RelOps::execute() {
         string proString = v->toString();
         size_t start_pos = proString.find("[");
         size_t end_pos = proString.find("_");
-        string tmpAlias = proString.substr(start_pos+1, end_pos-start_pos-1);
-        cout << proString << ":" << tmpAlias << ", " << nameMap[tmpAlias] << endl;
+        string tmpAlias = proString.substr(start_pos + 1, end_pos - start_pos - 1);
+//        cout << proString << ":" << tmpAlias << ", " << nameMap[tmpAlias] << endl;
         mySchemaOut->appendAtt(v->getAttPair(myCatalog, nameMap[tmpAlias]));
         if (v->getType().compare("SUM") == 0) {
             aggsToCompute.push_back(make_pair(MyDB_AggType::SUM, v->toString().substr(3)));
@@ -280,6 +163,9 @@ void RelOps::execute() {
 
     MyDB_RecordPtr temp = outputTable->getEmptyRecord();
     MyDB_RecordIteratorAltPtr myIter = outputTable->getIteratorAlt();
+    int cao = 0;
+    cout << endl;
+    cout << "Printing top 30 records from result set: " << endl;
     while (myIter->advance()) {
         stringstream buffer;
         myIter->getCurrent(temp);
@@ -290,12 +176,20 @@ void RelOps::execute() {
             cout << res[orderMap[i]] << "|";
         }
         cout << endl;
+        cao++;
+        if (cao == 30)
+            break;
     }
+    cout << endl;
 
-    if (remove("./output.bin") != 0)
-        perror("Error deleting file");
-    else
-        puts("File successfully deleted");
+
+    stop = time(NULL);
+    printf("Use Time: %ld second(s)\n", (stop - start));
+
+//    if (remove("./*.bin") != 0);
+//        perror("Error deleting file");
+//    else;
+//        puts("File successfully deleted");
 }
 
 //string RelOps::cutPrefix(string input, string alias) {
@@ -332,4 +226,311 @@ string RelOps::constructPredicate(vector<string> allPredicates) {
     }
 //    cout << "predicate is " << res << endl;
     return res;
+}
+
+
+MyDB_TableReaderWriterPtr
+RelOps::optimize(vector<pair<string, string>> tablesToProcess, vector<ExprTreePtr> valuesToSelect,
+                 vector<ExprTreePtr> allDisjunctions, vector<ExprTreePtr> groupingClauses) {
+    int num = tablesToProcess.size();
+    //sort
+    vector<pair<unsigned long, int> > vec; //first: number, second: index
+    for (int i = 0; i < num; i++) {
+        unsigned long tmp = myTables[tablesToProcess[i].first]->getTable()->getTupleCount();
+        vec.push_back(make_pair(tmp, i));
+    }
+    sort(vec.begin(), vec.end());
+//    for (auto a:vec)
+//        cout << "Order: " << a.first << "   " << a.second << endl;
+    set<int> already_joined;
+    int st = 2;
+    if ((num == 5) && (tablesToProcess[vec[0].second].first == "nation"))
+        st = 4;
+    already_joined.insert(vec[st].second);
+    MyDB_TableReaderWriterPtr joinedTables_ = myTables[tablesToProcess[vec[st].second].first];
+    joinedTables_->getTable()->getSchema()->setAtts(tablesToProcess[vec[st].second].second);  // rename
+
+
+    string t_alias = tablesToProcess[vec[st].second].second;
+    vector<string> rprojections;
+
+    set<string> tmp;
+
+    tmp.clear();
+
+    //right
+    for (auto expr : valuesToSelect) {
+        string str = expr->toString();
+        while (str.find("[" + t_alias + "_") != string::npos) {
+            int startpos = str.find("[" + t_alias + "_") + 1;
+            int endpos = str.find("]");
+            string res = str.substr(startpos, endpos - startpos);
+            tmp.insert(res);
+            str = str.substr(endpos + 1);
+        }
+    }
+
+    for (auto expr : allDisjunctions) {
+        string str = expr->toString();
+        while (str.find("[" + t_alias + "_") != string::npos) {
+            int startpos = str.find("[" + t_alias + "_") + 1;
+            int endpos = str.find("]");
+            string res = str.substr(startpos, endpos - startpos);
+            tmp.insert(res);
+            str = str.substr(endpos + 1);
+        }
+    }
+
+    for (auto expr : groupingClauses) {
+        string str = expr->toString();
+        while (str.find("[" + t_alias + "_") != string::npos) {
+            int startpos = str.find("[" + t_alias + "_") + 1;
+            int endpos = str.find("]");
+            string res = str.substr(startpos, endpos - startpos);
+            tmp.insert(res);
+            str = str.substr(endpos + 1);
+        }
+    }
+    MyDB_SchemaPtr testOut = make_shared<MyDB_Schema>();
+
+    for (auto &s : joinedTables_->getTable()->getSchema()->getAtts()) {
+        if (tmp.find(s.first) != tmp.end()){
+//            cout << "insert " << s.first << endl;
+            testOut->appendAtt(s);
+            rprojections.push_back("[" + s.first + "]");
+        }
+    }
+
+    MyDB_TablePtr testOutTable = make_shared<MyDB_Table>("testOut1", "testOut1.bin", testOut);
+    MyDB_TableReaderWriterPtr joinedTables = make_shared<MyDB_TableReaderWriter>(testOutTable, myMgr);
+
+    RegularSelection test2(joinedTables_, joinedTables,
+                           "bool[true]", rprojections);
+
+    test2.run();
+
+    for (int i = 1; i < vec.size(); i++) { // 添加n-1次
+//        cout << "Outer loop time: " << i << endl;
+//        if (remove("./output_.bin") != 0);
+        bool flag = false;
+        for (int j = 0; j < vec.size(); j++) {
+//            cout << "Inner loop for: " << j << endl;
+            if (already_joined.find(vec[j].second) != already_joined.end()) // find it
+                continue;
+            int cur = vec[j].second;
+            string curName = tablesToProcess[cur].first;
+            string curAlias = tablesToProcess[cur].second;
+            //check connected
+            for (auto expr : allDisjunctions) {
+                pair<bool, string> joinedPair = expr->beJoined();
+                if (joinedPair.first) {
+                    string atts = joinedPair.second;
+                    int pos = atts.find("|");
+                    string leftAtt = atts.substr(0, pos);
+                    string rightAtt = atts.substr(pos + 1, atts.size() - pos - 1);
+                    if ((leftAtt.find(curAlias + "_") == 1) || (rightAtt.find(curAlias + "_") ==
+                                                                1)) { // find the cur table, now check whether has connection within the set
+                        string findAlias;
+                        if ((leftAtt.find(curAlias + "_") == 1)) {
+                            int findIt = rightAtt.find("_") - 1;
+                            findAlias = rightAtt.substr(1, findIt);
+                        } else {
+                            int findIt = leftAtt.find("_") - 1;
+                            findAlias = leftAtt.substr(1, findIt);
+                        }
+//                        cout << "Potential match for: " << findAlias << endl;
+                        for (auto est: already_joined) {
+                            string existName = tablesToProcess[est].first;
+                            string existAlias = tablesToProcess[est].second;
+                            if (findAlias == existAlias) { // find the match
+//                                cout << "Exact match for: " << findAlias << endl;
+                                joinedTables = joinTwoTables(joinedTables, existName, existAlias, curName, curAlias,
+                                                             valuesToSelect, allDisjunctions, groupingClauses);
+                                already_joined.insert(cur);
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag)
+                            break;
+                    }
+                }
+            }
+            if (flag)
+                break;
+        }
+    }
+    return joinedTables;
+}
+
+
+MyDB_TableReaderWriterPtr
+RelOps::joinTwoTables(MyDB_TableReaderWriterPtr leftTable, string leftTableName, string leftTableAlias,
+                      string rightTableName, string rightTableAlias, vector<ExprTreePtr> valuesToSelect,
+                      vector<ExprTreePtr> allDisjunctions, vector<ExprTreePtr> groupingClauses) {
+
+    cout << "Joining table " << leftTableAlias << "  +  " << rightTableAlias << endl;
+
+    MyDB_TableReaderWriterPtr rightTable_ = myTables[rightTableName];
+
+//            rightTable->loadFromTextFile("./"+rightTableName+".tbl");
+
+//    leftTable->getTable()->getSchema()->setAtts(leftTableAlias);  // rename
+    rightTable_->getTable()->getSchema()->setAtts(rightTableAlias);  // rename
+
+
+
+
+
+    vector<string> rprojections;
+
+    set<string> tmp;
+
+    tmp.clear();
+    //right
+    for (auto expr : valuesToSelect) {
+        string str = expr->toString();
+        while (str.find("[" + rightTableAlias + "_") != string::npos) {
+            int startpos = str.find("[" + rightTableAlias + "_") + 1;
+            int endpos = str.find("]");
+            string res = str.substr(startpos, endpos - startpos);
+            tmp.insert(res);
+            str = str.substr(endpos + 1);
+        }
+    }
+
+    for (auto expr : allDisjunctions) {
+        string str = expr->toString();
+        while (str.find("[" + rightTableAlias + "_") != string::npos) {
+            int startpos = str.find("[" + rightTableAlias + "_") + 1;
+            int endpos = str.find("]");
+            string res = str.substr(startpos, endpos - startpos);
+            tmp.insert(res);
+            str = str.substr(endpos + 1);
+        }
+    }
+
+    for (auto expr : groupingClauses) {
+        string str = expr->toString();
+        while (str.find("[" + rightTableAlias + "_") != string::npos) {
+            int startpos = str.find("[" + rightTableAlias + "_") + 1;
+            int endpos = str.find("]");
+            string res = str.substr(startpos, endpos - startpos);
+            tmp.insert(res);
+            str = str.substr(endpos + 1);
+        }
+    }
+
+    MyDB_SchemaPtr testOut = make_shared<MyDB_Schema>();
+
+    for (auto &s : rightTable_->getTable()->getSchema()->getAtts()) {
+        if (tmp.find(s.first) != tmp.end()){
+            testOut->appendAtt(s);
+            rprojections.push_back("[" + s.first + "]");
+        }
+    }
+
+    MyDB_TablePtr testOutTable = make_shared<MyDB_Table>("testOut", "testOut.bin", testOut);
+    MyDB_TableReaderWriterPtr rightTable = make_shared<MyDB_TableReaderWriter>(testOutTable, myMgr);
+
+    RegularSelection test2(rightTable_, rightTable,
+                           "bool[true]", rprojections);
+
+    test2.run();
+
+    MyDB_SchemaPtr mySchemaOut = make_shared<MyDB_Schema>();
+
+    vector<string> allProjections;
+
+    vector<pair<string, MyDB_AttTypePtr>> leftAtts = leftTable->getTable()->getSchema()->getAtts();
+    vector<pair<string, MyDB_AttTypePtr>> rightAtts = rightTable->getTable()->getSchema()->getAtts();
+
+    for (auto &p : leftAtts) {
+        mySchemaOut->appendAtt(p);
+        allProjections.push_back("[" + p.first + "]");
+    }
+    for (auto &p : rightAtts) {
+        mySchemaOut->appendAtt(p);
+        allProjections.push_back("[" + p.first + "]");
+    }
+
+    MyDB_TablePtr myTableOut = make_shared<MyDB_Table>("output_" + leftTableAlias + "_" + rightTableAlias,
+                                                       "output_" + leftTableAlias + "_" + rightTableAlias + ".bin",
+                                                       mySchemaOut);
+    MyDB_TableReaderWriterPtr outputTable = make_shared<MyDB_TableReaderWriter>(myTableOut, myMgr);
+
+    vector<pair<string, string>> equalityChecks;
+    vector<string> finalPredicates;
+    vector<string> leftPredicates;
+    vector<string> rightPredicates;
+
+    for (auto expr : allDisjunctions) {
+        pair<bool, string> joinedPair = expr->beJoined();
+        if (joinedPair.first) {
+            string atts = joinedPair.second;
+            int pos = atts.find("|");
+            string leftAtt = atts.substr(0, pos);
+            string rightAtt = atts.substr(pos + 1, atts.size() - pos - 1);
+            if ((leftAtt.find(leftTableAlias + "_") == 1) && (rightAtt.find(rightTableAlias + "_") == 1)) {
+                finalPredicates.push_back(expr->toString());
+                equalityChecks.emplace_back(make_pair(leftAtt, rightAtt));
+            } else if ((rightAtt.find(leftTableAlias + "_") == 1) &&
+                       (leftAtt.find(rightTableAlias + "_") == 1)) {
+                finalPredicates.push_back(expr->toString());
+                equalityChecks.emplace_back(make_pair(rightAtt, leftAtt));
+            }
+        } else {
+            if (joinedPair.second == leftTableAlias)
+                leftPredicates.push_back(expr->toString());
+            else if (joinedPair.second == rightTableAlias)
+                rightPredicates.push_back(expr->toString());
+        }
+    }
+
+    string finalSelectionPredicate = constructPredicate(finalPredicates);
+    string leftSelectionPredicate = constructPredicate(leftPredicates);
+    string rightSelectionPredicate = constructPredicate(rightPredicates);
+
+    if (finalPredicates.empty()) {
+        cout << "NO COMMON PREDICATE, CANNOT JOIN!" << endl;
+//        leftTable->getTable()->getSchema()->resetAtts();  // reset
+//        rightTable->getTable()->getSchema()->resetAtts();  // reset
+//        if (remove("./testOut.bin") != 0);
+        return nullptr;
+    }
+
+    ScanJoin scan(leftTable, rightTable, outputTable,
+                  finalSelectionPredicate, allProjections, equalityChecks, leftSelectionPredicate,
+                  rightSelectionPredicate);
+
+
+    cout << leftTableAlias << "   " << rightTableAlias << "   " << finalSelectionPredicate << "    "
+         << leftSelectionPredicate << "   " << rightSelectionPredicate << endl << endl;
+
+    for (auto t:allProjections)
+        cout << t << endl;
+    cout << endl;
+    for (auto t:equalityChecks)
+        cout << t.first << "   " << t.second << endl;
+
+    scan.run();
+
+    cout << "Table result: " << endl;
+    MyDB_RecordPtr tem3p = outputTable->getEmptyRecord();
+    MyDB_RecordIteratorAltPtr myIter3 = outputTable->getIteratorAlt();
+    int counter = 0;
+    while (myIter3->advance()) {
+        myIter3->getCurrent(tem3p);
+        cout << tem3p << endl;
+        counter++;
+        if (counter == 12)
+            break;
+    }
+    cout << "*******************************************" << endl;
+
+
+//    leftTable->getTable()->getSchema()->resetAtts();  // reset
+//    rightTable->getTable()->getSchema()->resetAtts();  // reset
+//    if (remove("./testOut.bin") != 0);
+    return outputTable;
 }

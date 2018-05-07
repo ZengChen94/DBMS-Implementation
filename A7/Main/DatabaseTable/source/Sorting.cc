@@ -117,10 +117,10 @@ MyDB_RecordIteratorAltPtr buildItertorOverSortedRuns (int runSize, MyDB_TableRea
 	// this is the list of all of the pages in the file
 	vector <vector<MyDB_PageReaderWriter>> allPages;
 
-	// this is the pages making up the current execute
+	// this is the pages making up the current run
 	vector <vector<MyDB_PageReaderWriter>> pagesToSort;
 
-	// this is the list of all of the iterators, with one for each execute
+	// this is the list of all of the iterators, with one for each run
 	vector <MyDB_RecordIteratorAltPtr> runIters;
 	
 	// process the file 
@@ -164,7 +164,7 @@ MyDB_RecordIteratorAltPtr buildItertorOverSortedRuns (int runSize, MyDB_TableRea
 			pagesToSort.push_back (run);
 		}
 
-		// if we are not done reading this execute, go on to the next one
+		// if we are not done reading this run, go on to the next one
 		if (pagesToSort.size () != runSize && i != sortMe.getNumPages () - 1)
 			continue;
 
@@ -177,7 +177,7 @@ MyDB_RecordIteratorAltPtr buildItertorOverSortedRuns (int runSize, MyDB_TableRea
 			// repeatedly merge the last two pages
 			while (pagesToSort.size () > 0) {
 	
-				// if there is one execute, then just add it
+				// if there is one run, then just add it
 				if (pagesToSort.size () == 1) {
 					newPagesToSort.push_back (pagesToSort.back ());
 					pagesToSort.pop_back ();
@@ -202,7 +202,7 @@ MyDB_RecordIteratorAltPtr buildItertorOverSortedRuns (int runSize, MyDB_TableRea
 		// now we have a single list, so create an iterator for it
 		runIters.push_back (getIteratorAlt (pagesToSort[0]));
 
-		// and start over on the next execute
+		// and start over on the next run
 		pagesToSort.clear ();
 	}
 	

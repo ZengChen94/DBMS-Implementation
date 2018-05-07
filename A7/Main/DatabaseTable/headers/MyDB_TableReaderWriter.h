@@ -35,6 +35,10 @@ public:
 	// create a table reader/writer
 	MyDB_TableReaderWriter (MyDB_TablePtr forMe, MyDB_BufferManagerPtr myBuffer);
 
+	// copy from fromMe; note that the resuting copy has its own schema that can
+	// be modified independently of the original
+	MyDB_TableReaderWriter (MyDB_TableReaderWriterPtr fromMe);
+
 	// gets an empty record from this table
 	MyDB_RecordPtr getEmptyRecord ();
 

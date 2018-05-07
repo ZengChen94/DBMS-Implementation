@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-// this class encapsulates a selection execute using a B-Plus Tree
+// this class encapsulates a selection run using a B-Plus Tree
 
 class BPlusSelection {
 

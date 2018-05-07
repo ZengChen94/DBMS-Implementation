@@ -39,7 +39,7 @@ void BPlusSelection :: run () {
 			continue;
 		}
 
-		// execute all of the computations
+		// run all of the computations
 		int i = 0;
 		for (auto &f : finalComputations) {
 			outputRec->getAtt (i++)->set (f());

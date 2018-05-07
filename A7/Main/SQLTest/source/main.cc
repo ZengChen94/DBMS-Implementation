@@ -165,11 +165,8 @@ int main (int numArgs, char **args) {
 						// print it out
 						final->printSFWQuery ();
 
-                        auto begin = chrono::high_resolution_clock::now();
 						RelOps relOps(final, myCatalog, allTableReaderWriters, myMgr);
                         relOps.execute();
-                        auto end = chrono::high_resolution_clock::now();
-                        cout << "[Duration]: " << chrono::duration_cast<chrono::nanoseconds>(end-begin).count()  << " nanoseconds." << endl;
 					}
 
 					// get outta here

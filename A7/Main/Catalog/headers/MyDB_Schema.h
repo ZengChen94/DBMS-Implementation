@@ -33,6 +33,9 @@ public:
 	// add to the catalog
 	void putInCatalog (string TableName, MyDB_CatalogPtr toMe);
 
+	void setAtts (string str);
+
+    void resetAtts ();
 	// to print out the the screen
 	friend std::ostream& operator<<(std::ostream& os, const MyDB_Schema printMe);
 	friend std::ostream& operator<<(std::ostream& os, const MyDB_SchemaPtr printMe);

@@ -128,7 +128,7 @@ private:
 	// lists all of the pages of RAM that have been pinned in this way
 	vector <void *> threadPinnedPages;
 
-	// this is the start and end of the call stack used to execute each of the threads
+	// this is the start and end of the call stack used to run each of the threads	
 	// when we are executing in multi-thrreaded mode
 	void *stackBase;
 	void *stackEnd;

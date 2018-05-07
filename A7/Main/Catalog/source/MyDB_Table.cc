@@ -13,6 +13,22 @@ MyDB_Table :: MyDB_Table (string name, string storageLocIn) {
 	rootLocation = -1;
 }
 
+MyDB_Table &MyDB_Table :: operator = (MyDB_Table &toMe) {
+	allCounts = toMe.allCounts;
+	count = toMe.count;
+	sortAtt = toMe.sortAtt;
+	fileType = toMe.fileType;
+	last = toMe.last;
+	tableName = toMe.tableName;
+	storageLoc = toMe.storageLoc;
+	mySchema = make_shared <MyDB_Schema> ();
+	for (auto &a : toMe.mySchema->getAtts ()) {
+		mySchema->getAtts ().push_back (make_pair (a.first, a.second));
+	}
+	rootLocation = toMe.rootLocation;
+	return *this;
+}
+
 MyDB_Table :: MyDB_Table (string name, string storageLocIn, MyDB_SchemaPtr mySchemaIn) {
 	tableName = name;
 	storageLoc = storageLocIn;

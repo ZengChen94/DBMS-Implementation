@@ -7,7 +7,7 @@
 #include "MyDB_TableReaderWriter.h"
 #include "IteratorComparator.h"
 
-// performs a TPMMS of the table sortMe.  The results are written to sortIntoMe.  The execute
+// performs a TPMMS of the table sortMe.  The results are written to sortIntoMe.  The run 
 // size for the first phase of the TPMMS is given by runSize.  Comparisons are performed 
 // using comparator, lhs, rhs
 void sort (int runSize, MyDB_TableReaderWriter &sortMe, MyDB_TableReaderWriter &sortIntoMe,
@@ -20,7 +20,7 @@ void sort (int runSize, MyDB_TableReaderWriter &sortMe, MyDB_TableReaderWriter &
 MyDB_RecordIteratorAltPtr buildItertorOverSortedRuns (int runSize, MyDB_TableReaderWriter &sortMe,
         function <bool ()> comparator, MyDB_RecordPtr lhs, MyDB_RecordPtr rhs);
 
-// just like the above, except that in addition, the specified selection predicates are execute
+// just like the above, except that in addition, the specified selection predicates are run
 // over the input records so that only the records matching the selection predicates is sorted
 MyDB_RecordIteratorAltPtr buildItertorOverSortedRuns (int runSize, MyDB_TableReaderWriter &sortMe,
         function <bool ()> comparator, MyDB_RecordPtr lhs, MyDB_RecordPtr rhs, string pred);

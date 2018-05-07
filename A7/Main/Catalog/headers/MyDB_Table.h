@@ -89,6 +89,9 @@ public:
         void setTupleCount (size_t toMe);
         size_t getTupleCount ();
 
+	// make a copy
+	MyDB_Table &operator = (MyDB_Table &setToMe);
+
 private:
 
 	// the distinct value counts

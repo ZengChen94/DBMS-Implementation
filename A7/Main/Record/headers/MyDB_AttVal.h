@@ -3,8 +3,7 @@
 #define ATT_VAL_H
 
 #include <memory>
-#include <string>
-#include <memory.h>
+#include <cstring>
 
 // create a smart pointer for the catalog
 using namespace std;

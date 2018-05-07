@@ -50,7 +50,7 @@ ScanJoin :: ScanJoin (MyDB_TableReaderWriterPtr leftInputIn, MyDB_TableReaderWri
 }
 
 void ScanJoin :: run () {
-
+//	cout << "start join" << endl;
 	// this is the hash map we'll use to look up data... the key is the hashed value
 	// of all of the records' join keys, and the value is a list of pointers were all
 	// of the records with that hsah value are located
@@ -83,6 +83,7 @@ void ScanJoin :: run () {
 
 		// hash the current record
 		myIter->getCurrent (leftInputRec);
+//		cout << "cout left "<< leftInputRec << endl;
 
 		// see if it is accepted by the preicate
 		if (!leftPred ()->toBool ()) {
@@ -133,7 +134,7 @@ void ScanJoin :: run () {
 
 	// this is the output record
 	MyDB_RecordPtr outputRec = output->getEmptyRecord ();
-	
+
 	// now, iterate through the right table
 	MyDB_RecordIteratorPtr myIterAgain = rightTable->getIterator (rightInputRec);
 	while (myIterAgain->hasNext ()) {
@@ -159,17 +160,19 @@ void ScanJoin :: run () {
 
 		// if there is a match, then get the list of matches
 		vector <void *> &potentialMatches = myHash [hashVal];
-		
+
+        int cccc = 0;
 		// and iterate though the potential matches, checking each of them
 		for (auto &v : potentialMatches) {
 
 			// build the combined record
 			leftInputRec->fromBinary (v);
 
+
 			// check to see if it is accepted by the join predicate
 			if (finalPredicate ()->toBool ()) {
 
-				// execute all of the computations
+				// run all of the computations
 				int i = 0;
 				for (auto &f : finalComputations) {
 					outputRec->getAtt (i++)->set (f());
@@ -181,10 +184,12 @@ void ScanJoin :: run () {
 				// or else the record's internal buffer may cause it
 				// to write old values
 				outputRec->recordContentHasChanged ();
+//				cout << "append" << endl;
 				output->append (outputRec);	
 			}
 		}
 	}
+//	cout << "finish join" << endl;
 }
 
 #endif

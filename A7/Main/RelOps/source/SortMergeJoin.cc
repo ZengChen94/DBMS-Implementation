@@ -76,7 +76,7 @@ void SortMergeJoin :: run () {
 	// this is the output record
 	MyDB_RecordPtr outputRec = output->getEmptyRecord ();
 
-	// it is time to execute the merge!!
+	// it is time to run the merge!!
 	MyDB_PageReaderWriter lastPage (true, *(leftTable->getBufferMgr ()));
 	vector <MyDB_PageReaderWriter> allPages;
 

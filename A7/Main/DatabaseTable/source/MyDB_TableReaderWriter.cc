@@ -26,6 +26,19 @@
 
 using namespace std;
 
+MyDB_TableReaderWriter :: MyDB_TableReaderWriter (MyDB_TableReaderWriterPtr fromMe) {
+	forMe = fromMe->forMe;
+	myBuffer = fromMe->myBuffer;
+
+	if (forMe->lastPage () == -1) {
+		forMe->setLastPage (0);
+		lastPage = make_shared <MyDB_PageReaderWriter> (*this, forMe->lastPage ());
+		lastPage->clear ();
+	} else {
+		lastPage = make_shared <MyDB_PageReaderWriter> (*this, forMe->lastPage ());	
+	}
+}
+
 MyDB_TableReaderWriter :: MyDB_TableReaderWriter (MyDB_TablePtr forMeIn, MyDB_BufferManagerPtr myBufferIn) {
 	forMe = forMeIn;
 	myBuffer = myBufferIn;
